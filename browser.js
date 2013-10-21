@@ -25,6 +25,5 @@
  */
 
 global.txtml = {
-  Graph: require("graphlib").Graph,
-  Renderer: require("dagre-d3").Renderer
+  render: require("./lib/render.js").render
 };
