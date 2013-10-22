@@ -2,13 +2,15 @@
 <html>
 <head>
   <title>TxtML test page</title>
-
-  <script src="../deps/d3.v3.min.js" charset="utf-8"></script>
-  <script src="../build/txtml.js"></script>
-
   <link rel="stylesheet" type="text/css" href="./style.css" />
+  <script src="../build/txtml.js" charset="utf-8"></script>
+  <script type="text/javascript">
+    function main() {
+      txtml.render('svg g');
+    }
+  </script>
 </head>
-<body onload="txtml.render(d3.select('svg g'))">
+<body onload="main()">
   <svg width=650 height=680>
     <g transform="translate(20,20)"/>
   </svg>

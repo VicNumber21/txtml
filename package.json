@@ -18,7 +18,7 @@
     "grunt": "~0.4.1",
     "grunt-browserify": "~1.2.8",
     "grunt-contrib-watch": "~0.5.3",
-    "grunt-download": "~0.2.0"
+    "d3": "~3.3.8"
   },
   "dependencies": {
     "graphlib": "0.5.x",
