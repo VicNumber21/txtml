@@ -24,6 +24,6 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-global.txtml = {
-  render: require("./lib/render.js").render
-};
+global.d3 = require('d3');
+
+global.txtml = require('./lib/txtml').txtml;
