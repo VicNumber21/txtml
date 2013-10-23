@@ -5,14 +5,22 @@
   <link rel="stylesheet" type="text/css" href="./style.css" />
   <script src="../build/txtml.js" charset="utf-8"></script>
   <script type="text/javascript">
+    function test_doc () {
+      return document.getElementById('test-doc').value;
+    };
     function main() {
       txtml.
-        parse("test").
+        parse(test_doc()).
         render('svg g');
     }
   </script>
 </head>
 <body onload="main()">
+  <textarea id="test-doc">test <--<| TEST
+test - -> API::Phone
+test <>--> Cool
+Cool <--<|> Tool</textarea>
+<a href="#" onclick="main()">Submit</a>
   <svg width=650 height=680>
     <g transform="translate(20,20)"/>
   </svg>
