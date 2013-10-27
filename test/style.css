@@ -1,11 +1,23 @@
 svg {
   border: 1px solid #999;
+  height: 404px;
+  width: 600px;
 }
 
 text {
   font-weight: 300;
   font-family: "Helvetica Neue", Helvetica, Arial, sans-serf;
   font-size: 14px;
+}
+
+textarea {
+  width: 400px;
+  height: 400px;
+  resize: none;
+}
+
+.error {
+  color: red;
 }
 
 rect {
@@ -30,10 +42,6 @@ rect {
 
 h1, h2 {
   color: #333;
-}
-
-textarea {
-  width: 800px;
 }
 
 label {
