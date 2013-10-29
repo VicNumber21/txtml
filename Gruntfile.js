@@ -5,6 +5,7 @@ module.exports = function(grunt) {
     pkg: pkg,
     moduleName: pkg.name,
     moduleJs: '<%= moduleName %>.js',
+    moduleMinJs: '<%= moduleName %>.min.js',
 
     coffee: {
       options: {
@@ -25,6 +26,13 @@ module.exports = function(grunt) {
         }
       }
     },
+    uglify: {
+      build: {
+        files: {
+          'build/<%= moduleMinJs %>': ['build/<%= moduleJs %>']
+        }
+      }
+    },
     watch: {
       src: {
         files: ['browser.js','lib/**/*.js'],
@@ -39,11 +47,12 @@ module.exports = function(grunt) {
   // Plugins
   grunt.loadNpmTasks('grunt-contrib-coffee');
   grunt.loadNpmTasks('grunt-browserify');
+  grunt.loadNpmTasks('grunt-contrib-uglify');
   grunt.loadNpmTasks('grunt-contrib-watch');
 
   // Targets
   grunt.registerTask('default', ['build']);
-  grunt.registerTask('build', ['_init', 'coffee', 'browserify']);
+  grunt.registerTask('build', ['_init', 'coffee', 'browserify', 'uglify']);
   grunt.registerTask('clean', function() {
     grunt.file.delete('lib');
     grunt.file.delete('build');

@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>TxtML test page</title>
+  <link rel="stylesheet" type="text/css" href="./style.css" />
+  <script src="../build/txtml.min.js" charset="utf-8"></script>
+  <script type="text/javascript">
+    function txtml_spec_area () {
+      return document.getElementById('txtml-spec-area');
+    };
+    function main() {
+      _txtml_spec_area = txtml_spec_area();
+      _txtml_spec_area.setAttribute('class', '');
+      try {
+        txtml.
+          parse(_txtml_spec_area.value).
+          render('svg');
+      } catch (e) {
+        _txtml_spec_area.setAttribute('class', 'error');
+        console.log(e);
+      }
+    }
+  </script>
+</head>
+<body onload="main()">
+  <textarea id="txtml-spec-area" onkeyup="main()">Child &lt;--&lt;| Super
+Child - -&gt; NS::Dependency
+Child &lt;&gt;--&gt; ::Ref
+::Ref &lt;--&lt;|&gt; RefPool
+Super |&gt;--&gt; Second
+NS::Dependency &lt;- - Second
+Ref2 &lt;--&lt;&gt; Second
+RefPool &lt;|&gt;--&gt; Ref2</textarea>
+  <svg></svg>
+</body>
+</html>
