@@ -6,6 +6,18 @@ module.exports = function(grunt) {
     moduleName: pkg.name,
     moduleJs: '<%= moduleName %>.js',
 
+    coffee: {
+      options: {
+        bare: true
+      },
+      compile: {
+        files: {
+          'lib/renderer.js' : 'src/renderer.coffee',
+          'lib/parser.js' : 'src/parser.coffee',
+          'lib/txtml.js' : 'src/txtml.coffee'
+        }
+      }
+    },
     browserify: {
       build: {
         files: {
@@ -25,13 +37,15 @@ module.exports = function(grunt) {
   });
 
   // Plugins
+  grunt.loadNpmTasks('grunt-contrib-coffee');
   grunt.loadNpmTasks('grunt-browserify');
   grunt.loadNpmTasks('grunt-contrib-watch');
 
   // Targets
   grunt.registerTask('default', ['build']);
-  grunt.registerTask('build', ['_init','browserify']);
+  grunt.registerTask('build', ['_init', 'coffee', 'browserify']);
   grunt.registerTask('clean', function() {
+    grunt.file.delete('lib');
     grunt.file.delete('build');
   });
 
