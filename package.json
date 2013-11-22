@@ -21,7 +21,10 @@
     "d3": "~3.3.8",
     "pegjs": "~0.7.0",
     "grunt-contrib-coffee": "~0.7.0",
-    "grunt-contrib-uglify": "~0.2.5"
+    "grunt-contrib-uglify": "~0.2.5",
+    "chai": "~1.8.1",
+    "grunt-mocha": "~0.4.1",
+    "grunt-contrib-copy": "~0.4.1"
   },
   "dependencies": {
     "graphlib": "0.5.x",
