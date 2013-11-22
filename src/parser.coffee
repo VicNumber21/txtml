@@ -32,8 +32,8 @@ grammar = "
     l:name '<--<|>' r:name { return {type:'owns_a', left:r, right:l}; }
 
   dependency =
-    l:name '- ->' r:name { return {type:'use_a', left:l, right:r}; } /
-    l:name '<- -' r:name { return {type:'use_a', left:r, right:l}; }
+    l:name '- ->' r:name { return {type:'uses_a', left:l, right:r}; } /
+    l:name '<- -' r:name { return {type:'uses_a', left:r, right:l}; }
 
   name =
     space letters:[A-Za-z0-9:_]+ space { return letters.join(''); }
