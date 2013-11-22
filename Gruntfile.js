@@ -6,28 +6,63 @@ module.exports = function(grunt) {
     moduleName: pkg.name,
     moduleJs: '<%= moduleName %>.js',
     moduleMinJs: '<%= moduleName %>.min.js',
+    moduleUnitJs: '<%= moduleName %>.unit.js',
 
     coffee: {
       options: {
         bare: true
       },
       compile: {
-        files: {
-          'lib/renderer.js' : 'src/renderer.coffee',
-          'lib/parser.js' : 'src/parser.coffee',
-          'lib/txtml.js' : 'src/txtml.coffee'
-        }
+        files: [{
+          expand: true,
+          flatten: true,
+          cwd: 'src/',
+          src: ['**/*.coffee'],
+          dest: 'lib/js/',
+          ext: ".js"
+        }]
+      },
+      unit: {
+        files: [{
+          expand: true,
+          flatten: true,
+          cwd: 'test/auto/unit/',
+          src: ['**/*.coffee'],
+          dest: 'lib/unit/',
+          ext: ".js"
+        }]
+      }
+    },
+    concat: {
+      unit: {
+        src: ['lib/unit/*.js'],
+        dest: 'build/unit.js'
+      }
+    },
+    copy: {
+      unit: {
+        files: [
+          {expand:true, src: 'test/auto/unit/unit.html', dest: 'build/', flatten: true},
+          {expand:true, src: 'node_modules/chai/chai.js', dest: 'build/', flatten: true},
+          {expand:true, src: 'node_modules/grunt-mocha/node_modules/mocha/mocha.js', dest: 'build/', flatten: true},
+          {expand:true, src: 'node_modules/grunt-mocha/node_modules/mocha/mocha.css', dest: 'build/', flatten: true}
+        ]
       }
     },
     browserify: {
-      build: {
+      compile: {
         files: {
           'build/<%= moduleJs %>': ['browser.js']
+        }
+      },
+      unit: {
+        files: {
+          'build/<%= moduleUnitJs %>': ['ut-browser.js']
         }
       }
     },
     uglify: {
-      build: {
+      optimize: {
         files: {
           'build/<%= moduleMinJs %>': ['build/<%= moduleJs %>']
         }
@@ -41,6 +76,15 @@ module.exports = function(grunt) {
           spawn: false
         }
       }
+    },
+    mocha: {
+      options: {
+        bail: true,
+        log: true,
+        reporter: 'Spec',
+        run: true
+      },
+      all: [ 'build/unit.html' ]
     }
   });
 
@@ -49,10 +93,20 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-browserify');
   grunt.loadNpmTasks('grunt-contrib-uglify');
   grunt.loadNpmTasks('grunt-contrib-watch');
+  grunt.loadNpmTasks('grunt-contrib-concat');
+  grunt.loadNpmTasks('grunt-contrib-copy');
+  grunt.loadNpmTasks('grunt-mocha');
 
   // Targets
   grunt.registerTask('default', ['build']);
-  grunt.registerTask('build', ['_init', 'coffee', 'browserify', 'uglify']);
+  grunt.registerTask('build', ['compile', 'optimize']);
+  grunt.registerTask('compile', ['_init', 'coffee:compile', 'browserify:compile']);
+  grunt.registerTask('optimize', ['uglify:optimize']);
+
+  grunt.registerTask('unit', ['compile_unit', 'prepare_unit', 'mocha']);
+  grunt.registerTask('compile_unit', ['coffee:compile', 'browserify:unit', 'coffee:unit', 'concat:unit']);
+  grunt.registerTask('prepare_unit', ['copy:unit']);
+
   grunt.registerTask('clean', function() {
     grunt.file.delete('lib');
     grunt.file.delete('build');

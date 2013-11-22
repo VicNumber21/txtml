@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+    <title>TxtML Unit tests</title>
+    <link rel="stylesheet" href="mocha.css" type="text/css" charset="utf-8" />
+</head>
+<body>
+    <div id="mocha"></div>
+
+    <script src="mocha.js" type="text/javascript" charset="utf-8"></script>
+    <script type="text/javascript" charset="utf-8">
+        mocha.setup('bdd');
+    </script>
+
+    <script src="chai.js" type="text/javascript" charset="utf-8"></script>
+    <script type="text/javascript" charset="utf-8">
+        var expect = chai.expect;
+    </script>
+
+    <script src="txtml.unit.js" type="text/javascript" charset="utf-8"></script>
+    <script src="unit.js" type="text/javascript" charset="utf-8"></script>
+
+    <script type="text/javascript" charset="utf-8">
+        if (navigator.userAgent.indexOf('PhantomJS') < 0) {
+            mocha.run();
+        }
+    </script>
+</body>
+</html>

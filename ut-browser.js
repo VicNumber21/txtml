@@ -24,6 +24,5 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-global.d3 = require('d3');
-
-global.txtml = require('./lib/js/txtml').txtml;
+global.Graph = require('Graphlib').Digraph
+global.parser = require('./lib/js/parser');
