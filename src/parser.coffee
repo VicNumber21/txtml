@@ -45,17 +45,17 @@ grammar = "
 
 parser = pegjs.buildParser grammar, {trackLineAndColumn: true}
 
-safe_add_node = (graph, node) ->
+safeAddNode = (graph, node) ->
   graph.addNode node, {label: node} unless graph.hasNode node
 
-safe_add_edge = (graph, id, node1, node2, info) ->
+safeAddEdge = (graph, id, node1, node2, info) ->
   graph.addEdge id, node1, node2, info unless graph.hasEdge id
 
 exports.parse = (graph, txt) ->
   doc = parser.parse txt
 
   for {left, type, right} in doc
-    safe_add_node graph, left
-    safe_add_node graph, right
-    edge_id = left + type + right
-    safe_add_edge graph, edge_id, left, right, {label: type}
+    safeAddNode graph, left
+    safeAddNode graph, right
+    edgeId = left + type + right
+    safeAddEdge graph, edgeId, left, right, {label: type}
