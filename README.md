@@ -1,6 +1,9 @@
 TxtML
 =====
 
+### Build status
+[![Build Status](https://travis-ci.org/VicNumber21/txtml.png)](https://travis-ci.org/VicNumber21/txtml)
+
 ###Overview
 The project was inspired by [js sequence diagrams project]
 (http://bramp.github.io/js-sequence-diagrams).
