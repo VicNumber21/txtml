@@ -24,5 +24,5 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-global.Graph = require('Graphlib').Digraph
+global.Graph = require('graphlib').Digraph
 global.parser = require('./lib/js/parser');

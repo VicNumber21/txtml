@@ -1,4 +1,4 @@
-Graph = require('Graphlib').Digraph
+Graph = require('graphlib').Digraph
 renderer = require './renderer'
 parser = require './parser'
 
