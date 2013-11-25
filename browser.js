@@ -26,4 +26,4 @@
 
 global.d3 = require('d3');
 
-global.txtml = require('./lib/js/txtml').txtml;
+global.txtml = require('txtml/txtml').txtml;

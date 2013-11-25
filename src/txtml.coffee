@@ -1,6 +1,6 @@
 Graph = require('graphlib').Digraph
-renderer = require './renderer'
-parser = require './parser'
+renderer = require 'txtml/renderer'
+parser = require 'txtml/parser'
 
 txtml = {}
 

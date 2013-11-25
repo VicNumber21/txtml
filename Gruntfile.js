@@ -18,7 +18,7 @@ module.exports = function(grunt) {
           flatten: true,
           cwd: 'src/',
           src: ['**/*.coffee'],
-          dest: 'lib/js/',
+          dest: 'lib/txtml/',
           ext: ".js"
         }]
       },
@@ -50,6 +50,11 @@ module.exports = function(grunt) {
       }
     },
     browserify: {
+      options: {
+        aliasMappings: [
+          {cwd: 'lib/', src: ['**/*.js']}
+        ]
+      },
       compile: {
         files: {
           'build/<%= moduleJs %>': ['browser.js']

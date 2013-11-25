@@ -25,4 +25,4 @@
  */
 
 global.Graph = require('graphlib').Digraph
-global.parser = require('./lib/js/parser');
+global.parser = require('txtml/parser');
