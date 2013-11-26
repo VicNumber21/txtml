@@ -23,6 +23,19 @@
   </script>
 </head>
 <body onload="main()">
+  <p><div id="version"></div>
+  <script type="text/javascript" charset="utf-8">
+      (function () {
+          var _version = document.getElementById('version');
+          var _txt = '  Version under test: ' + txtml.version;
+
+          if (_version.innerText != null) {
+              _version.innerText = _txt;
+          } else {
+              _version.textContent = _txt;
+          }
+      })();
+  </script>
   <textarea id="txtml-spec-area" onkeyup="main()">Child &lt;--&lt;| Super
 Child - -&gt; NS::Dependency
 Child &lt;&gt;--&gt; ::Ref

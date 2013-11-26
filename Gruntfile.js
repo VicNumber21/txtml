@@ -1,5 +1,6 @@
 module.exports = function(grunt) {
   var pkg = grunt.file.readJSON('package.json');
+  var version = pkg.version;
 
   grunt.initConfig({
     pkg: pkg,
@@ -105,11 +106,11 @@ module.exports = function(grunt) {
   // Targets
   grunt.registerTask('default', ['build']);
   grunt.registerTask('build', ['compile', 'optimize']);
-  grunt.registerTask('compile', ['_init', 'coffee:compile', 'browserify:compile']);
+  grunt.registerTask('compile', ['_init', '_dump_version', 'coffee:compile', 'browserify:compile']);
   grunt.registerTask('optimize', ['uglify:optimize']);
 
   grunt.registerTask('unit', ['compile_unit', 'prepare_unit', 'mocha']);
-  grunt.registerTask('compile_unit', ['coffee:compile', 'browserify:unit', 'coffee:unit', 'concat:unit']);
+  grunt.registerTask('compile_unit', ['_dump_version', 'coffee:compile', 'browserify:unit', 'coffee:unit', 'concat:unit']);
   grunt.registerTask('prepare_unit', ['copy:unit']);
 
   grunt.registerTask('clean', function() {
@@ -120,5 +121,9 @@ module.exports = function(grunt) {
   // Internal targets
   grunt.registerTask('_init', function() {
     grunt.file.mkdir('build');
+  });
+
+  grunt.registerTask('_dump_version', function() {
+    grunt.file.write('lib/txtml/version.js', 'exports.version = "' + version + '"\n');
   });
 };
