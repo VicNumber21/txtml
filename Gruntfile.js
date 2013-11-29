@@ -195,9 +195,7 @@ module.exports = function(grunt) {
     git(this.async(), ['commit', '-m', 'Increase version to ' + version]);
   });
 
-  grunt.registerTask('_merge_version', ['_checkout_develop',
-                                        '_merge_feature_branch',
-                                        '_remove_feature_branch']);
+  grunt.registerTask('_merge_version', ['_checkout_develop', '_merge_feature_branch']);
 
   grunt.registerTask('_checkout_develop', function() {
     git(this.async(), ['checkout', 'develop']);
@@ -207,15 +205,11 @@ module.exports = function(grunt) {
     git(this.async(), ['merge', '--commit', '--no-edit', '--no-ff', feature_branch]);
   });
 
-  grunt.registerTask('_remove_feature_branch', function() {
-    git(this.async(), ['branch', '-D', feature_branch]);
-  });
-
   grunt.registerTask('_tag_version', function() {
     git(this.async(), ['tag', tag(version)]);
   });
 
-  grunt.registerTask('_push_version', ['_push_commit', '_push_tag']);
+  grunt.registerTask('_push_version', ['_push_commit', '_push_tag', '_remove_feature_branch']);
 
   grunt.registerTask('_push_commit', function() {
     git(this.async(), ['push', '--prune', 'publish', 'develop']);
@@ -224,6 +218,11 @@ module.exports = function(grunt) {
   grunt.registerTask('_push_tag', function() {
     git(this.async(), ['push', 'publish', tag(version)]);
   });
+
+  grunt.registerTask('_remove_feature_branch', function() {
+    git(this.async(), ['push', 'publish', '--delete', feature_branch]);
+  });
+
 
   grunt.registerTask('_next_version', function() {
     var semver_txt = version.split('.');
