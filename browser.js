@@ -27,3 +27,4 @@
 global.d3 = require('d3');
 
 global.txtml = require('txtml/txtml').txtml;
+global.txtml.version = require('txtml/version').version

@@ -24,5 +24,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+global.txtml = {}
+global.txtml.version = require('txtml/version').version
 global.Graph = require('graphlib').Digraph
 global.parser = require('txtml/parser');
