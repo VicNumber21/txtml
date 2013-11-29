@@ -2,13 +2,28 @@ module.exports = function(grunt) {
   var pkg = grunt.file.readJSON('package.json');
   var version = pkg.version;
   var current_tags = [];
-  var tag = function () {
+  var tag = function (version) {
     return 'v' + version;
   };
   var feature_branch = null;
   var spawn = grunt.util.spawn;
   var contains = function(arr, elem) {
     return (arr.indexOf(elem) != -1);
+  };
+  var git = function (done, args, handler) {
+    spawn({cmd: 'git', 'args': args}, function(error, result, code) {
+      if (code !== 0) {
+        grunt.warn(error, code);
+      } else {
+        console.log('git output:\n' + result.stdout);
+      }
+
+      if (handler) {
+        handler(result.stdout);
+      }
+
+      done();
+    });
   };
 
   grunt.initConfig({
@@ -139,7 +154,7 @@ module.exports = function(grunt) {
   });
 
   grunt.registerTask('_manage_version', function() {
-    if (feature_branch && !contains(current_tags, tag())) {
+    if (feature_branch && !contains(current_tags, tag(version))) {
       grunt.task.run('_create_new_version');
     }
   });
@@ -155,143 +170,53 @@ module.exports = function(grunt) {
   grunt.registerTask('_check_uncommitted_changes', ['_check_staged', '_check_unstaged']);
 
   grunt.registerTask('_check_staged', function() {
-    var done = this.async();
-
-    spawn({cmd: 'git', args: ['diff', '--shortstat', '--cached']}, function(error, result, code) {
-      console.log(result);
-
-      if (code !== 0) {
-        grunt.warn(error, code);
-      } else if (result.stdout.length > 0) {
+    git(this.async(), ['diff', '--shortstat', '--cached'], function (result) {
+      if (result.length > 0) {
         grunt.warn('Cannot publish since stage area is not empty');
       }
-
-      done();
     });
   });
 
   grunt.registerTask('_check_unstaged', function() {
-    var done = this.async();
-
-    spawn({cmd: 'git', args: ['diff', '--shortstat']}, function(error, result, code) {
-      console.log(result);
-
-      if (code !== 0) {
-        grunt.warn(error, code);
-      } else if (result.stdout.length > 0) {
+    git(this.async(), ['diff', '--shortstat'], function (result) {
+      if (result.length > 0) {
         grunt.warn('Cannot publish since there are uncommitted modifications');
       }
-
-      done();
     });
   });
 
   grunt.registerTask('_commit_version', ['_stage_version', '_create_commit']);
 
   grunt.registerTask('_stage_version', function() {
-    var done = this.async();
-
-    spawn({cmd: 'git', args: ['add', 'package.json']}, function(error, result, code) {
-      console.log(result);
-
-      if (code !== 0) {
-        grunt.warn(error, code);
-      }
-
-      done();
-    });
+    git(this.async(), ['add', 'package.json']);
   });
 
   grunt.registerTask('_create_commit', function() {
-    var done = this.async();
-
-    spawn({cmd: 'git', args: ['commit', '-m', '"Increase version to ' + version + '"']},
-          function(error, result, code) {
-
-      console.log(result);
-
-      if (code !== 0) {
-        grunt.warn(error, code);
-      }
-
-      done();
-    });
+    git(this.async(), ['commit', '-m', '"Increase version to ' + version + '"']);
   });
 
   grunt.registerTask('_merge_version', ['_checkout_develop', '_merge_feature_branch']);
 
   grunt.registerTask('_checkout_develop', function() {
-    var done = this.async();
-
-    spawn({cmd: 'git', args: ['checkout', 'develop']}, function(error, result, code) {
-      console.log(result);
-
-      if (code !== 0) {
-        grunt.warn(error, code);
-      }
-
-      done();
-    });
+    git(this.async(), ['checkout', 'develop']);
   });
 
   grunt.registerTask('_merge_feature_branch', function() {
-    var done = this.async();
-
-    spawn({cmd: 'git', args: ['merge', '--commit', '--no-edit', '--no-ff', feature_branch]},
-          function(error, result, code) {
-
-      console.log(result);
-
-      if (code !== 0) {
-        grunt.warn(error, code);
-      }
-
-      done();
-    });
+    git(this.async(), ['merge', '--commit', '--no-edit', '--no-ff', feature_branch]);
   });
 
   grunt.registerTask('_tag_version', function() {
-    var done = this.async();
-
-    spawn({cmd: 'git', args: ['tag', tag()]}, function(error, result, code) {
-      console.log(result);
-
-      if (code !== 0) {
-        grunt.warn(error, code);
-      }
-
-      done();
-    });
+    git(this.async(), ['tag', tag(version)]);
   });
 
   grunt.registerTask('_push_version', ['_push_commit', '_push_tag']);
 
   grunt.registerTask('_push_commit', function() {
-    var done = this.async();
-
-    spawn({cmd: 'git', args: ['push', 'origin', 'develop']}, function(error, result, code) {
-      console.log(result);
-
-      if (code !== 0) {
-        grunt.warn(error, code);
-      }
-
-      done();
-    });
+    git(this.async(), ['push', 'origin', 'develop']);
   });
 
   grunt.registerTask('_push_tag', function() {
-    var done = this.async();
-
-    spawn({cmd: 'git', args: ['push', 'origin', tag()]}, function(error, result, code) {
-      console.log(result);
-
-      if (code !== 0) {
-        grunt.warn(error, code);
-      }
-
-      done();
-    });
+    git(this.async(), ['push', 'origin', tag(version)]);
   });
 
   grunt.registerTask('_next_version', function() {
@@ -308,44 +233,27 @@ module.exports = function(grunt) {
   });
 
   grunt.registerTask('_feature_branch', function() {
-    var done = this.async();
     feature_branch = null;
 
-    spawn({cmd: 'git', args: ['branch', '--contains']}, function(error, result, code) {
-      console.log(result);
+    git(this.async(), ['branch', '--contains'], function (result) {
+      var branches = result.split('\n');
 
-      if (code === 0) {
-        var branches = result.stdout.split('\n');
+      for (var i = 0; i < branches.length; ++i) {
+        var feature_branch_match = branches[i].match(/feature\/\S+/);
 
-        for (var i = 0; i < branches.length; ++i) {
-          feature_branch = branches[i].match(/feature\/\S+/);
-
-          if (feature_branch) {
-            break;
-          }
+        if (feature_branch_match) {
+          feature_branch = feature_branch_match[0];
+          break;
         }
-      } else {
-        grunt.warn(error, code);
       }
-
-      done();
     });
   });
 
   grunt.registerTask('_current_tags', function() {
-    var done = this.async();
     current_tags = [];
 
-    spawn({cmd: 'git', args: ['tag', '--contains']}, function(error, result, code) {
-      console.log(result);
-
-      if (code === 0) {
-        current_tags = result.stdout.split('\n');
-      } else {
-        grunt.warn(error, code);
-      }
-      
-      done();
+    git(this.async(), ['tag', '--contains'], function (result) {
+        current_tags = result.split('\n');
     });
   });
 };
