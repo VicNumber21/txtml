@@ -212,11 +212,11 @@ module.exports = function(grunt) {
   grunt.registerTask('_push_version', ['_push_commit', '_push_tag']);
 
   grunt.registerTask('_push_commit', function() {
-    git(this.async(), ['push', 'origin', 'develop']);
+    git(this.async(), ['push', 'publish', 'develop']);
   });
 
   grunt.registerTask('_push_tag', function() {
-    git(this.async(), ['push', 'origin', tag(version)]);
+    git(this.async(), ['push', 'publish', tag(version)]);
   });
 
   grunt.registerTask('_next_version', function() {
