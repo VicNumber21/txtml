@@ -20,8 +20,8 @@ grammar = "
     dependency
 
   generalization =
-    l:name '<--<|' r:name { return {type:'is_a', left:l, right:r}; } /
-    l:name '|>-->' r:name { return {type:'is_a', left:r, right:l}; }
+    l:name '--<|' r:name { return {type:'is_a', left:l, right:r}; } /
+    l:name '|>--' r:name { return {type:'is_a', left:r, right:l}; }
 
   aggregation =
     l:name '<>-->' r:name { return {type:'has_a', left:l, right:r}; } /
