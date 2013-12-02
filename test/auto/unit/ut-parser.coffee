@@ -19,18 +19,18 @@ describe 'Parser tests', ->
 
     it 'should be parsed from super to child', ->
       g = new Graph
-      parser.parse g, 'Super |>--> Child'
+      parser.parse g, 'Super |>-- Child'
       expectEtalonGaph g, nodeSpec, edgeSpec
 
     it 'should be parsed from child to super', ->
       g = new Graph
-      parser.parse g, 'Child <--<| Super'
+      parser.parse g, 'Child --<| Super'
       expectEtalonGaph g, nodeSpec, edgeSpec
 
     it 'should ignore duplicates', ->
       g = new Graph
-      parser.parse g, 'Super |>--> Child'
-      parser.parse g, 'Child <--<| Super'
+      parser.parse g, 'Super |>-- Child'
+      parser.parse g, 'Child --<| Super'
       expectEtalonGaph g, nodeSpec, edgeSpec
 
   describe 'Aggregation', ->
@@ -96,7 +96,7 @@ describe 'Parser tests', ->
   describe 'Mixed', ->
     it 'should contain all relationships and ignore blank lines', ->
       txt = """
-                A |>--> B
+                A |>-- B
 
                 B <|>--> C
                 A <--<> C
