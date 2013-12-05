@@ -2,8 +2,27 @@ module.exports = function(grunt) {
   var pkg = grunt.file.readJSON('package.json');
   var version = pkg.version;
   var current_tags = [];
-  var tag = function (version) {
+  var latest_tag = null;
+  var toTag = function (version) {
     return 'v' + version;
+  };
+  var toVersion = function (tag) {
+    return tag.match(/\d+\.\d+\.\d+/)[0];
+  };
+  var toSemver = function (version){
+    return version.split('.');
+  };
+  var toString = function (semver) {
+    return semver.join('.');
+  };
+  var compareSemver = function (lsemver, rsemver) {
+    var res = 0;
+
+    for(var i = 0; (res === 0) && (i < 3); ++i) {
+      res = parseInt(lsemver[i], 10) - parseInt(rsemver[i], 10);
+    }
+
+    return res;
   };
   var feature_branch = null;
   var spawn = grunt.util.spawn;
@@ -137,7 +156,7 @@ module.exports = function(grunt) {
   grunt.registerTask('compile_unit', ['_dump_version', 'coffee:compile', 'browserify:unit', 'coffee:unit', 'concat:unit']);
   grunt.registerTask('prepare_unit', ['copy:unit']);
   grunt.registerTask('publish', ['build', 'unit', 'merge']);
-  grunt.registerTask('merge', ['_feature_branch', '_current_tags', '_manage_version']);
+  grunt.registerTask('merge', ['_feature_branch', '_current_tags', '_latest_tag', '_manage_version']);
 
   grunt.registerTask('clean', function() {
     grunt.file.delete('lib/txtml');
@@ -154,9 +173,46 @@ module.exports = function(grunt) {
     grunt.file.write('lib/txtml/version.js', 'exports.version = "' + version + '"\n');
   });
 
+  grunt.registerTask('_feature_branch', function() {
+    feature_branch = null;
+
+    git(this.async(), ['branch', '--contains'], function (result) {
+      var branches = result.split('\n');
+
+      for (var i = 0; i < branches.length; ++i) {
+        var feature_branch_match = branches[i].match(/feature\/\S+/);
+
+        if (feature_branch_match) {
+          feature_branch = feature_branch_match[0];
+          break;
+        }
+      }
+    });
+  });
+
+  grunt.registerTask('_current_tags', function() {
+    current_tags = [];
+
+    git(this.async(), ['tag', '--contains'], function (result) {
+        current_tags = result.split('\n');
+    });
+  });
+
+  grunt.registerTask('_latest_tag', function() {
+    latest_tag = null;
+
+    git(this.async(), ['describe', '--abbrev=0', '--tags'], function (result) {
+        latest_tag = result.split('\n')[0];
+    });
+  });
+
   grunt.registerTask('_manage_version', function() {
-    if (feature_branch && !contains(current_tags, tag(version))) {
-      grunt.task.run('_create_new_version');
+    if (feature_branch && !contains(current_tags, toTag(version))) {
+      if (compareSemver(toSemver(version), toSemver(toVersion(latest_tag))) > 0) {
+        grunt.task.run('_merge_new_version');
+      } else {
+        grunt.task.run('_create_new_version');
+      }
     }
   });
 
@@ -164,9 +220,11 @@ module.exports = function(grunt) {
                                              '_next_version',
                                              '_save_version',
                                              '_commit_version',
-                                             '_merge_version',
-                                             '_tag_version',
-                                             '_push_version']);
+                                             '_merge_new_version']);
+
+  grunt.registerTask('_merge_new_version', ['_merge_version',
+                                            '_tag_version',
+                                            '_push_version']);
 
   grunt.registerTask('_check_uncommitted_changes', ['_check_staged', '_check_unstaged']);
 
@@ -207,7 +265,7 @@ module.exports = function(grunt) {
   });
 
   grunt.registerTask('_tag_version', function() {
-    git(this.async(), ['tag', tag(version)]);
+    git(this.async(), ['tag', toTag(version)]);
   });
 
   grunt.registerTask('_push_version', ['_push_commit', '_push_tag', '_remove_feature_branch']);
@@ -217,18 +275,17 @@ module.exports = function(grunt) {
   });
 
   grunt.registerTask('_push_tag', function() {
-    git(this.async(), ['push', 'publish', tag(version)]);
+    git(this.async(), ['push', 'publish', toTag(version)]);
   });
 
   grunt.registerTask('_remove_feature_branch', function() {
     git(this.async(), ['push', 'publish', '--delete', feature_branch]);
   });
 
-
   grunt.registerTask('_next_version', function() {
-    var semver_txt = version.split('.');
-    semver_txt[2] = '' + (parseInt(semver_txt[2], 10) + 1);
-    version = semver_txt.join('.');
+    var semver = toSemver(version);
+    semver[2] = '' + (parseInt(semver[2], 10) + 1);
+    version = toString(semver);
     console.log('Next version ' + version);
   });
 
@@ -236,30 +293,5 @@ module.exports = function(grunt) {
     console.log('Writing version ' + version + ' to package.json');
     pkg.version = version;
     grunt.file.write('package.json', JSON.stringify(pkg, undefined, 2) + '\n');
-  });
-
-  grunt.registerTask('_feature_branch', function() {
-    feature_branch = null;
-
-    git(this.async(), ['branch', '--contains'], function (result) {
-      var branches = result.split('\n');
-
-      for (var i = 0; i < branches.length; ++i) {
-        var feature_branch_match = branches[i].match(/feature\/\S+/);
-
-        if (feature_branch_match) {
-          feature_branch = feature_branch_match[0];
-          break;
-        }
-      }
-    });
-  });
-
-  grunt.registerTask('_current_tags', function() {
-    current_tags = [];
-
-    git(this.async(), ['tag', '--contains'], function (result) {
-        current_tags = result.split('\n');
-    });
   });
 };
