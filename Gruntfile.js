@@ -82,12 +82,12 @@ module.exports = function(grunt) {
       },
       compile: {
         files: {
-          'build/<%= moduleJs %>': ['browser.js']
+          'build/<%= moduleJs %>': ['lib/txtml-bundle.js']
         }
       },
       unit: {
         files: {
-          'build/<%= moduleUnitJs %>': ['ut-browser.js']
+          'build/<%= moduleUnitJs %>': ['lib/unit-bundle.js']
         }
       }
     },
@@ -100,8 +100,8 @@ module.exports = function(grunt) {
     },
     watch: {
       src: {
-        files: ['browser.js','lib/**/*.js'],
-        tasks: ['build'],
+        files: ['Gruntfile.js','lib/**/*.js', 'src/**/*.coffee'],
+        tasks: ['build', 'unit'],
         options: {
           spawn: false
         }
@@ -140,7 +140,8 @@ module.exports = function(grunt) {
   grunt.registerTask('merge', ['_feature_branch', '_current_tags', '_manage_version']);
 
   grunt.registerTask('clean', function() {
-    grunt.file.delete('lib');
+    grunt.file.delete('lib/txtml');
+    grunt.file.delete('lib/unit');
     grunt.file.delete('build');
   });
 
