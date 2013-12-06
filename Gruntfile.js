@@ -59,20 +59,18 @@ module.exports = function(grunt) {
       compile: {
         files: [{
           expand: true,
-          flatten: true,
           cwd: 'src/',
           src: ['**/*.coffee'],
-          dest: 'lib/txtml/',
+          dest: 'lib/',
           ext: ".js"
         }]
       },
       unit: {
         files: [{
           expand: true,
-          flatten: true,
-          cwd: 'test/auto/unit/',
+          cwd: 'test/auto/',
           src: ['**/*.coffee'],
-          dest: 'lib/unit/',
+          dest: 'lib/',
           ext: ".js"
         }]
       }
@@ -119,7 +117,7 @@ module.exports = function(grunt) {
     },
     watch: {
       src: {
-        files: ['Gruntfile.js','lib/**/*.js', 'src/**/*.coffee'],
+        files: ['Gruntfile.js','lib/**/*.js', 'src/**/*.coffee', 'test/**/*coffee'],
         tasks: ['build', 'unit'],
         options: {
           spawn: false
