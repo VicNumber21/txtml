@@ -65,93 +65,124 @@ describe 'LinkedList tests', ->
       expect(test_list.last().prev().value()).to.be.equal 'test'
 
   describe 'Insert list:', ->
-    it '- appendList should work with non-reversed list', ->
-      test_list = new LinkedList [1, 2, 3]
-      inserted_list = new LinkedList [7, 8, 9]
-      test_list.appendList inserted_list
-      expect(test_list.length()).to.be.equal 6
-      expect(test_list.toArray()).to.be.eql [1, 2, 3, 7, 8, 9]
-      expect(test_list.first().value()).to.be.equal 1
-      expect(test_list.last().value()).to.be.equal 9
+    describe 'empty list', ->
+      it '- should be appended correctly', ->
+        test_list = new LinkedList [1, 2, 3]
+        inserted_list = new LinkedList
+        test_list.appendList inserted_list
+        expect(test_list.length()).to.be.equal 3
+        expect(test_list.toArray()).to.be.eql [1, 2, 3]
 
-    it '- prependList should work with non-reversed list', ->
-      test_list = new LinkedList [1, 2, 3]
-      inserted_list = new LinkedList [7, 8, 9]
-      test_list.prependList inserted_list
-      expect(test_list.length()).to.be.equal 6
-      expect(test_list.toArray()).to.be.eql [7, 8, 9, 1, 2, 3]
-      expect(test_list.first().value()).to.be.equal 7
-      expect(test_list.last().value()).to.be.equal 3
+      it '- should be prepended correctly', ->
+        test_list = new LinkedList [1, 2, 3]
+        inserted_list = new LinkedList
+        test_list.prependList inserted_list
+        expect(test_list.length()).to.be.equal 3
+        expect(test_list.toArray()).to.be.eql [1, 2, 3]
 
-    it '- insertListBefore should work with non-reversed list', ->
-      test_list = new LinkedList [1, 2, 3]
-      inserted_list = new LinkedList [7, 8, 9]
-      test_list.insertListBefore test_list.first().next(), inserted_list
-      expect(test_list.length()).to.be.equal 6
-      expect(test_list.toArray()).to.be.eql [1, 7, 8, 9, 2, 3]
-      expect(test_list.first().value()).to.be.equal 1
-      expect(test_list.first().next().value()).to.be.equal 7
-      expect(test_list.first().next().next().next().next().value()).to.be.equal 2
-      expect(test_list.last().prev().value()).to.be.equal 2
-      expect(test_list.last().prev().prev().value()).to.be.equal 9
-      expect(test_list.last().prev().prev().prev().prev().prev().value()).to.be.equal 1
+      it '- should be inserted before the particular iterator correctly', ->
+        test_list = new LinkedList [1, 2, 3]
+        inserted_list = new LinkedList
+        test_list.insertListBefore test_list.first().next(), inserted_list
+        expect(test_list.length()).to.be.equal 3
+        expect(test_list.toArray()).to.be.eql [1, 2, 3]
 
-    it '- insertListAfter should work with non-reversed list', ->
-      test_list = new LinkedList [1, 2, 3]
-      inserted_list = new LinkedList [7, 8, 9]
-      test_list.insertListAfter test_list.first().next(), inserted_list
-      expect(test_list.length()).to.be.equal 6
-      expect(test_list.toArray()).to.be.eql [1, 2, 7, 8, 9, 3]
-      expect(test_list.first().next().value()).to.be.equal 2
-      expect(test_list.first().next().next().value()).to.be.equal 7
-      expect(test_list.first().next().next().next().next().next().value()).to.be.equal 3
-      expect(test_list.last().value()).to.be.equal 3
-      expect(test_list.last().prev().value()).to.be.equal 9
-      expect(test_list.last().prev().prev().prev().prev().value()).to.be.equal 2
+      it '- should be inserted after the particular iterator correctly', ->
+        test_list = new LinkedList [1, 2, 3]
+        inserted_list = new LinkedList
+        test_list.insertListAfter test_list.first().next(), inserted_list
+        expect(test_list.length()).to.be.equal 3
+        expect(test_list.toArray()).to.be.eql [1, 2, 3]
 
-    it '- appendList should work with reversed list', ->
-      test_list = new LinkedList [1, 2, 3]
-      inserted_list = new LinkedList [7, 8, 9]
-      test_list.appendList inserted_list.reverse()
-      expect(test_list.length()).to.be.equal 6
-      expect(test_list.toArray()).to.be.eql [1, 2, 3, 9, 8, 7]
-      expect(test_list.first().value()).to.be.equal 1
-      expect(test_list.last().value()).to.be.equal 7
+    describe 'non-reversed list', ->
+      it '- should be appended correctly', ->
+        test_list = new LinkedList [1, 2, 3]
+        inserted_list = new LinkedList [7, 8, 9]
+        test_list.appendList inserted_list
+        expect(test_list.length()).to.be.equal 6
+        expect(test_list.toArray()).to.be.eql [1, 2, 3, 7, 8, 9]
+        expect(test_list.first().value()).to.be.equal 1
+        expect(test_list.last().value()).to.be.equal 9
 
-    it '- prependList should work with reversed list', ->
-      test_list = new LinkedList [1, 2, 3]
-      inserted_list = new LinkedList [7, 8, 9]
-      test_list.prependList inserted_list.reverse()
-      expect(test_list.length()).to.be.equal 6
-      expect(test_list.toArray()).to.be.eql [9, 8, 7, 1, 2, 3]
-      expect(test_list.first().value()).to.be.equal 9
-      expect(test_list.last().value()).to.be.equal 3
+      it '- should be prepended correctly', ->
+        test_list = new LinkedList [1, 2, 3]
+        inserted_list = new LinkedList [7, 8, 9]
+        test_list.prependList inserted_list
+        expect(test_list.length()).to.be.equal 6
+        expect(test_list.toArray()).to.be.eql [7, 8, 9, 1, 2, 3]
+        expect(test_list.first().value()).to.be.equal 7
+        expect(test_list.last().value()).to.be.equal 3
 
-    it '- insertListBefore should work with reversed list', ->
-      test_list = new LinkedList [1, 2, 3]
-      inserted_list = new LinkedList [7, 8, 9]
-      test_list.insertListBefore test_list.first().next(), inserted_list.reverse()
-      expect(test_list.length()).to.be.equal 6
-      expect(test_list.toArray()).to.be.eql [1, 9, 8, 7, 2, 3]
-      expect(test_list.first().value()).to.be.equal 1
-      expect(test_list.first().next().value()).to.be.equal 9
-      expect(test_list.first().next().next().next().next().value()).to.be.equal 2
-      expect(test_list.last().prev().value()).to.be.equal 2
-      expect(test_list.last().prev().prev().value()).to.be.equal 7
-      expect(test_list.last().prev().prev().prev().prev().prev().value()).to.be.equal 1
+      it '- should be inserted before the particular iterator correctly', ->
+        test_list = new LinkedList [1, 2, 3]
+        inserted_list = new LinkedList [7, 8, 9]
+        test_list.insertListBefore test_list.first().next(), inserted_list
+        expect(test_list.length()).to.be.equal 6
+        expect(test_list.toArray()).to.be.eql [1, 7, 8, 9, 2, 3]
+        expect(test_list.first().value()).to.be.equal 1
+        expect(test_list.first().next().value()).to.be.equal 7
+        expect(test_list.first().next().next().next().next().value()).to.be.equal 2
+        expect(test_list.last().prev().value()).to.be.equal 2
+        expect(test_list.last().prev().prev().value()).to.be.equal 9
+        expect(test_list.last().prev().prev().prev().prev().prev().value()).to.be.equal 1
 
-    it '- insertListAfter should work with reversed list', ->
-      test_list = new LinkedList [1, 2, 3]
-      inserted_list = new LinkedList [7, 8, 9]
-      test_list.insertListAfter test_list.first().next(), inserted_list.reverse()
-      expect(test_list.length()).to.be.equal 6
-      expect(test_list.toArray()).to.be.eql [1, 2, 9, 8, 7, 3]
-      expect(test_list.first().next().value()).to.be.equal 2
-      expect(test_list.first().next().next().value()).to.be.equal 9
-      expect(test_list.first().next().next().next().next().next().value()).to.be.equal 3
-      expect(test_list.last().value()).to.be.equal 3
-      expect(test_list.last().prev().value()).to.be.equal 7
-      expect(test_list.last().prev().prev().prev().prev().value()).to.be.equal 2
+      it '- should be inserted after the particular iterator correctly', ->
+        test_list = new LinkedList [1, 2, 3]
+        inserted_list = new LinkedList [7, 8, 9]
+        test_list.insertListAfter test_list.first().next(), inserted_list
+        expect(test_list.length()).to.be.equal 6
+        expect(test_list.toArray()).to.be.eql [1, 2, 7, 8, 9, 3]
+        expect(test_list.first().next().value()).to.be.equal 2
+        expect(test_list.first().next().next().value()).to.be.equal 7
+        expect(test_list.first().next().next().next().next().next().value()).to.be.equal 3
+        expect(test_list.last().value()).to.be.equal 3
+        expect(test_list.last().prev().value()).to.be.equal 9
+        expect(test_list.last().prev().prev().prev().prev().value()).to.be.equal 2
+
+    describe 'reversed list', ->
+      it '- should be appended correctly', ->
+        test_list = new LinkedList [1, 2, 3]
+        inserted_list = new LinkedList [7, 8, 9]
+        test_list.appendList inserted_list.reverse()
+        expect(test_list.length()).to.be.equal 6
+        expect(test_list.toArray()).to.be.eql [1, 2, 3, 9, 8, 7]
+        expect(test_list.first().value()).to.be.equal 1
+        expect(test_list.last().value()).to.be.equal 7
+
+      it '- should be prepended correctly', ->
+        test_list = new LinkedList [1, 2, 3]
+        inserted_list = new LinkedList [7, 8, 9]
+        test_list.prependList inserted_list.reverse()
+        expect(test_list.length()).to.be.equal 6
+        expect(test_list.toArray()).to.be.eql [9, 8, 7, 1, 2, 3]
+        expect(test_list.first().value()).to.be.equal 9
+        expect(test_list.last().value()).to.be.equal 3
+
+      it '- should be inserted before the particular iterator correctly', ->
+        test_list = new LinkedList [1, 2, 3]
+        inserted_list = new LinkedList [7, 8, 9]
+        test_list.insertListBefore test_list.first().next(), inserted_list.reverse()
+        expect(test_list.length()).to.be.equal 6
+        expect(test_list.toArray()).to.be.eql [1, 9, 8, 7, 2, 3]
+        expect(test_list.first().value()).to.be.equal 1
+        expect(test_list.first().next().value()).to.be.equal 9
+        expect(test_list.first().next().next().next().next().value()).to.be.equal 2
+        expect(test_list.last().prev().value()).to.be.equal 2
+        expect(test_list.last().prev().prev().value()).to.be.equal 7
+        expect(test_list.last().prev().prev().prev().prev().prev().value()).to.be.equal 1
+
+      it '- should be inserted after the particular iterator correctly', ->
+        test_list = new LinkedList [1, 2, 3]
+        inserted_list = new LinkedList [7, 8, 9]
+        test_list.insertListAfter test_list.first().next(), inserted_list.reverse()
+        expect(test_list.length()).to.be.equal 6
+        expect(test_list.toArray()).to.be.eql [1, 2, 9, 8, 7, 3]
+        expect(test_list.first().next().value()).to.be.equal 2
+        expect(test_list.first().next().next().value()).to.be.equal 9
+        expect(test_list.first().next().next().next().next().next().value()).to.be.equal 3
+        expect(test_list.last().value()).to.be.equal 3
+        expect(test_list.last().prev().value()).to.be.equal 7
+        expect(test_list.last().prev().prev().prev().prev().value()).to.be.equal 2
 
   describe 'Reverse', ->
     it 'should work for empty list', ->

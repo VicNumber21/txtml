@@ -3,6 +3,20 @@ class _ListNode
     @_prev = @
     @_next = @
 
+###
+  it looks like the approach to insert list object as is is not the best what can be done
+  better to insert node chain into target list
+  to work correctly with reversed list, some marker should be used in the node to swap prev / next
+  pointer usage for this and the following nodes
+  Special cases:
+    1. insertion of zero-length list should be ignored
+    2. insertion of list of length 1 should ignore reverse flag of this list (insert the value of the node)
+    3. insertion of list of length 2 may be done with the current state of prev / next usage (flatten on fly)
+    4. the rest should follow the common rule
+  It could be a headacke with deletion of node. Need to investigate it more
+  So better to implement deletion in the current architecture and refactor to the better solution then.
+###
+
 class _ListOfListNode extends _ListNode
   constructor: (_value, @_reverseFlag) ->
     throw new error('Reverse flag must be set and be boolean') if typeof @_reverseFlag isnt 'boolean'
@@ -121,15 +135,21 @@ class LinkedList
     this
 
   prependList: (list) =>
-    listNode = @_createListNode list
-    @_prepend listNode
-    @_increaseLength list.length()
+    newNode = @_createListNode list
+
+    if newNode?
+      @_prepend newNode
+      @_increaseLength list.length()
+
     this
 
   appendList: (list) =>
-    listNode = @_createListNode list
-    @_append listNode
-    @_increaseLength list.length()
+    newNode = @_createListNode list
+
+    if newNode?
+      @_append newNode
+      @_increaseLength list.length()
+
     this
 
   insertListBefore: (nodeIter, list) =>
@@ -140,10 +160,11 @@ class LinkedList
     else
       newNode = @_createListNode list
 
-      if @_reversed
-        @_insertAfter node, newNode
-      else
-        @_insertBefore node, newNode
+      if newNode?
+        if @_reversed
+          @_insertAfter node, newNode
+        else
+          @_insertBefore node, newNode
 
     @_increaseLength list.length()
     this
@@ -156,10 +177,11 @@ class LinkedList
     else
       newNode = @_createListNode list
 
-      if @_reversed
-        @_insertBefore node, newNode
-      else
-        @_insertAfter node, newNode
+      if newNode?
+        if @_reversed
+          @_insertBefore node, newNode
+        else
+          @_insertAfter node, newNode
 
     @_increaseLength list.length()
     this
@@ -172,7 +194,10 @@ class LinkedList
     new _ListIterator this, @_dummy
 
   _createListNode: (list) =>
-    new _ListOfListNode(list, @_reversed isnt list._reversed)
+    switch list.length()
+      when 0 then undefined
+      when 1 then new _ListNode list.first().value()
+      else new _ListOfListNode(list, @_reversed isnt list._reversed)
 
   _prev: (current) =>
     node = if @_reversed then current._next else current._prev
