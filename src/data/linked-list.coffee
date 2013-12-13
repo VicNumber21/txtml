@@ -3,6 +3,10 @@ class _ListNode
     @_prev = @
     @_next = @
 
+  isValid: () =>
+    (this is this._prev._next) and (this is this._next._prev)
+
+
 ###
   it looks like the approach to insert list object as is is not the best what can be done
   better to insert node chain into target list
@@ -19,7 +23,7 @@ class _ListNode
 
 class _ListOfListNode extends _ListNode
   constructor: (_value, @_reverseFlag) ->
-    throw new error('Reverse flag must be set and be boolean') if typeof @_reverseFlag isnt 'boolean'
+    throw Error 'Reverse flag must be set and be boolean' if typeof @_reverseFlag isnt 'boolean'
     super _value
 
 
@@ -37,6 +41,9 @@ class _ListIterator
 
   isDone: () =>
     @_owner._dummy is @_current
+
+  validate: () =>
+    throw Error 'Invalid iterator' unless @_current.isValid()
 
 
 class _ListOfListIterator extends _ListIterator
@@ -103,6 +110,7 @@ class LinkedList
     this
 
   insertValueBefore: (nodeIter, val) =>
+    nodeIter.validate()
     node = nodeIter._current
 
     if @_isListOfListNode node
@@ -119,6 +127,7 @@ class LinkedList
     this
 
   insertValueAfter: (nodeIter, val) =>
+    nodeIter.validate()
     node = nodeIter._current
 
     if @_isListOfListNode node
@@ -153,6 +162,7 @@ class LinkedList
     this
 
   insertListBefore: (nodeIter, list) =>
+    nodeIter.validate()
     node = nodeIter._current
 
     if @_isListOfListNode node
@@ -170,6 +180,7 @@ class LinkedList
     this
 
   insertListAfter: (nodeIter, list) =>
+    nodeIter.validate()
     node = nodeIter._current
 
     if @_isListOfListNode node
@@ -184,6 +195,22 @@ class LinkedList
           @_insertAfter node, newNode
 
     @_increaseLength list.length()
+    this
+
+  remove: (nodeIter) =>
+    node = nodeIter._current
+
+    if node.isValid() and node isnt @_dummy
+      doRemoveNode = not isListOfListNode = @_isListOfListNode node
+
+      if isListOfListNode
+        internalList = node._value
+        internalList.remove nodeIter._iter
+        doRemoveNode = internalList.length() is 0
+
+      @_remove node if doRemoveNode
+      --@_lenght
+
     this
 
   toArray: () =>
@@ -236,6 +263,10 @@ class LinkedList
     newNode._next = node._next
     newNode._next._prev = newNode
     node._next = newNode
+
+  _remove: (node) =>
+    node._prev._next = node._next
+    node._next._prev = node._prev
 
 
 exports.LinkedList = LinkedList

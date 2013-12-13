@@ -184,6 +184,108 @@ describe 'LinkedList tests', ->
         expect(test_list.last().prev().value()).to.be.equal 7
         expect(test_list.last().prev().prev().prev().prev().value()).to.be.equal 2
 
+  describe 'Remove', ->
+    it 'should be fine with empty list', ->
+      test_list = new LinkedList
+      test_list.remove test_list.first()
+      test_list.remove test_list.last()
+      expect(test_list.length()).to.be.equal 0
+      expect(test_list.toArray()).to.be.eql []
+
+    it 'should be fine with begin and end iterators', ->
+      test_list = new LinkedList [1, 2, 3]
+      test_list.remove test_list.begin()
+      test_list.remove test_list.end()
+      expect(test_list.length()).to.be.equal 3
+      expect(test_list.toArray()).to.be.eql [1, 2, 3]
+
+    it 'should be fine with the first iterator of non-reversed list', ->
+      test_list = new LinkedList [1, 2, 3]
+      test_list.remove test_list.first()
+      expect(test_list.length()).to.be.equal 2
+      expect(test_list.toArray()).to.be.eql [2, 3]
+      expect(test_list.first().value()).to.be.equal 2
+
+    it 'should be fine with the last iterator of non-reversed list', ->
+      test_list = new LinkedList [1, 2, 3]
+      test_list.remove test_list.last()
+      expect(test_list.length()).to.be.equal 2
+      expect(test_list.toArray()).to.be.eql [1, 2]
+      expect(test_list.last().value()).to.be.equal 2
+
+    it 'should be fine with an iterator in the middle of non-reversed list', ->
+      test_list = new LinkedList [1, 2, 3]
+      test_list.remove test_list.first().next()
+      expect(test_list.length()).to.be.equal 2
+      expect(test_list.toArray()).to.be.eql [1, 3]
+
+    it 'should be fine with the first iterator of reversed list', ->
+      test_list = new LinkedList [1, 2, 3]
+      test_list.reverse().remove test_list.first()
+      expect(test_list.length()).to.be.equal 2
+      expect(test_list.toArray()).to.be.eql [2, 1]
+      expect(test_list.first().value()).to.be.equal 2
+
+    it 'should be fine with the last iterator of reversed list', ->
+      test_list = new LinkedList [1, 2, 3]
+      test_list.reverse().remove test_list.last()
+      expect(test_list.length()).to.be.equal 2
+      expect(test_list.toArray()).to.be.eql [3, 2]
+      expect(test_list.last().value()).to.be.equal 2
+
+    it 'should be fine with an iterator in the middle of reversed list', ->
+      test_list = new LinkedList [1, 2, 3]
+      test_list.reverse().remove test_list.first().next()
+      expect(test_list.length()).to.be.equal 2
+      expect(test_list.toArray()).to.be.eql [3, 1]
+
+    it 'should be fine with an iterator in just inserted non-reversed list', ->
+      test_list = new LinkedList [1, 2, 3]
+      inserted_list = new LinkedList [7, 8, 9]
+      test_list.insertListAfter test_list.first().next(), inserted_list
+      test_list.remove test_list.first().next().next().next()
+      expect(test_list.length()).to.be.equal 5
+      expect(test_list.toArray()).to.be.eql [1, 2, 7, 9, 3]
+
+    it 'should be fine with an iterator in just inserted reversed list', ->
+      test_list = new LinkedList [1, 2, 3]
+      inserted_list = new LinkedList [7, 8, 9]
+      test_list.insertListAfter test_list.first().next(), inserted_list.reverse()
+      test_list.remove test_list.first().next().next().next()
+      expect(test_list.length()).to.be.equal 5
+      expect(test_list.toArray()).to.be.eql [1, 2, 9, 7, 3]
+
+    it 'should be fine with an iterator in just inserted list of length 1', ->
+      test_list = new LinkedList [1, 2, 3]
+      inserted_list = new LinkedList [5]
+      test_list.insertListBefore test_list.first().next(), inserted_list
+      test_list.remove test_list.first().next()
+      expect(test_list.length()).to.be.equal 3
+      expect(test_list.toArray()).to.be.eql [1, 2, 3]
+
+    it 'should be fine if performed twice with the same iterator', ->
+      test_list = new LinkedList [1, 2, 3]
+      iter = test_list.first()
+      test_list.remove iter
+      test_list.remove iter
+      expect(test_list.length()).to.be.equal 2
+      expect(test_list.toArray()).to.be.eql [2, 3]
+      expect(test_list.first().value()).to.be.equal 2
+
+    it 'should be fine if performed during iteration through the list', ->
+      test_list = new LinkedList [1, 2, 3]
+      inserted_list = new LinkedList [7, 8, 9]
+      test_list.insertListBefore test_list.first().next(), inserted_list
+      iter = test_list.first()
+      length = test_list.length()
+
+      for i in [1..length]
+        test_list.remove iter
+        iter = iter.next()
+
+      expect(test_list.length()).to.be.equal 0
+      expect(test_list.toArray()).to.be.eql []
+
   describe 'Reverse', ->
     it 'should work for empty list', ->
       test_list = new LinkedList
