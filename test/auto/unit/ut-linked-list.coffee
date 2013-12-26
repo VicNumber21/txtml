@@ -185,20 +185,6 @@ describe 'LinkedList tests', ->
         expect(test_list.last().prev().prev().prev().prev().value()).to.be.equal 2
 
   describe 'Remove', ->
-    it 'should be fine with empty list', ->
-      test_list = new LinkedList
-      test_list.remove test_list.first()
-      test_list.remove test_list.last()
-      expect(test_list.length()).to.be.equal 0
-      expect(test_list.toArray()).to.be.eql []
-
-    it 'should be fine with begin and end iterators', ->
-      test_list = new LinkedList [1, 2, 3]
-      test_list.remove test_list.begin()
-      test_list.remove test_list.end()
-      expect(test_list.length()).to.be.equal 3
-      expect(test_list.toArray()).to.be.eql [1, 2, 3]
-
     it 'should be fine with the first iterator of non-reversed list', ->
       test_list = new LinkedList [1, 2, 3]
       test_list.remove test_list.first()
@@ -263,26 +249,12 @@ describe 'LinkedList tests', ->
       expect(test_list.length()).to.be.equal 3
       expect(test_list.toArray()).to.be.eql [1, 2, 3]
 
-    it 'should be fine if performed twice with the same iterator', ->
-      test_list = new LinkedList [1, 2, 3]
-      iter = test_list.first()
-      test_list.remove iter
-      test_list.remove iter
-      expect(test_list.length()).to.be.equal 2
-      expect(test_list.toArray()).to.be.eql [2, 3]
-      expect(test_list.first().value()).to.be.equal 2
-
     it 'should be fine if performed during iteration through the list', ->
       test_list = new LinkedList [1, 2, 3]
       inserted_list = new LinkedList [7, 8, 9]
       test_list.insertListBefore test_list.first().next(), inserted_list
       iter = test_list.first()
-      length = test_list.length()
-
-      for i in [1..length]
-        test_list.remove iter
-        iter = iter.next()
-
+      [_, iter] = test_list.remove iter until iter.isDone()
       expect(test_list.length()).to.be.equal 0
       expect(test_list.toArray()).to.be.eql []
 
