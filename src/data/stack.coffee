@@ -16,6 +16,9 @@ class Stack
   top: () =>
     @_list.first().value()
 
+  length: () =>
+    @_list.length()
+
   isEmpty: () =>
     @_list.isEmpty()
 
