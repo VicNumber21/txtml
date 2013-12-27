@@ -15,7 +15,7 @@ describe 'LinkedList tests', ->
       expect(test_list.isEmpty()).to.be.true
       expect(test_list.length()).to.be.equal 0
 
-  describe 'Insert value:', ->
+  describe 'Value insertion:', ->
     it '- appendValue should work with empty list', ->
       test_list = new LinkedList
       test_list.appendValue 5
@@ -64,7 +64,7 @@ describe 'LinkedList tests', ->
       expect(test_list.first().next().next().value()).to.be.equal 'test'
       expect(test_list.last().prev().value()).to.be.equal 'test'
 
-  describe 'Insert list:', ->
+  describe 'List insertion:', ->
     describe 'empty list', ->
       it '- should be appended correctly', ->
         test_list = new LinkedList [1, 2, 3]
@@ -184,7 +184,7 @@ describe 'LinkedList tests', ->
         expect(test_list.last().prev().value()).to.be.equal 7
         expect(test_list.last().prev().prev().prev().prev().value()).to.be.equal 2
 
-  describe 'Remove', ->
+  describe 'Removal', ->
     it 'should be fine with the first iterator of non-reversed list', ->
       test_list = new LinkedList [1, 2, 3]
       test_list.remove test_list.first()
@@ -258,7 +258,7 @@ describe 'LinkedList tests', ->
       expect(test_list.length()).to.be.equal 0
       expect(test_list.toArray()).to.be.eql []
 
-  describe 'Reverse', ->
+  describe 'Reversing', ->
     it 'should work for empty list', ->
       test_list = new LinkedList
       test_list.reverse()
@@ -285,3 +285,41 @@ describe 'LinkedList tests', ->
       expect(test_list.length()).to.be.equal 14
       expect(test_list.toArray()).to.be.eql [9, 20, 6, 10, 15, 11, 12, 8, 7, 5, 4, 3, 2, 1]
 
+  describe 'Iteration', ->
+    it 'should work in forward direction for empty list', ->
+      test_list = new LinkedList
+      iter = test_list.begin()
+      count = 0
+      ++count until (iter = iter.next()).isDone()
+      expect(count).to.be.equal 0
+
+    it 'should work in backward direction for empty list', ->
+      test_list = new LinkedList
+      iter = test_list.begin().reverse()
+      count = 0
+      ++count until (iter = iter.next()).isDone()
+      expect(count).to.be.equal 0
+
+    it 'should work in forward direction for non-reversed list', ->
+      test_list = new LinkedList [1, 2, 3, 4, 5]
+      iter = test_list.begin()
+      acc = (iter.value() until (iter = iter.next()).isDone())
+      expect(acc).to.be.eql [1, 2, 3, 4, 5]
+
+    it 'should work in backward direction for non-reversed list', ->
+      test_list = new LinkedList [1, 2, 3, 4, 5]
+      iter = test_list.begin().reverse()
+      acc = (iter.value() until (iter = iter.next()).isDone())
+      expect(acc).to.be.eql [5, 4, 3, 2, 1]
+
+    it 'should work in forward direction for reversed list', ->
+      test_list = new LinkedList [1, 2, 3, 4, 5]
+      iter = test_list.reverse().begin()
+      acc = (iter.value() until (iter = iter.next()).isDone())
+      expect(acc).to.be.eql [5, 4, 3, 2, 1]
+
+    it 'should work in backward direction for reversed list', ->
+      test_list = new LinkedList [1, 2, 3, 4, 5]
+      iter = test_list.reverse().begin().reverse()
+      acc = (iter.value() until (iter = iter.next()).isDone())
+      expect(acc).to.be.eql [1, 2, 3, 4, 5]

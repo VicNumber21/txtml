@@ -83,56 +83,42 @@ class _Iterator
 
   value: () =>
     @validate()
-    throw Error 'Iterator to dummy node' if @_isDummy()
+    throw Error 'Dummy node iterator' if @_isDummy()
     @_node.value
-
-  isDone: () =>
-    @_started and @_isDummy()
 
   reverse: () =>
     @_direction = @_direction.flip()
     this
 
-  _isDummy: () =>
-    @_owner._dummy is @_node
+  isDone: () =>
+    @_started and @_isDummy()
 
   validate: () =>
     throw Error 'Invalid node' unless @_node.isValid()
     throw Error 'Iteration finished' if @isDone()
 
+  _isDummy: () =>
+    @_owner._dummy is @_node
 
-###
-  it looks like the approach to insert list object as is is not the best what can be done
-  better to insert node chain into target list
-  to work correctly with reversed list, some marker should be used in the node to swap prev / next
-  pointer usage for this and the following nodes
-  Special cases:
-    1. insertion of zero-length list should be ignored
-    2. insertion of list of length 1 should ignore reverse flag of this list (insert the value of the node)
-    3. insertion of list of length 2 may be done with the current state of prev / next usage (flatten on fly)
-    4. the rest should follow the common rule
-  It could be a headacke with deletion of node. Need to investigate it more
-  So better to implement deletion in the current architecture and refactor to the better solution then.
-###
 
 class LinkedList
   constructor: (init = []) ->
     @_dummy = new _Node()
-    @_reversed = false
+    @_direction = _Direction::forward()
     @_lenght = 0
     @appendValue(val) for val in init
 
   begin: () =>
-    @_dummyIter @_direction()
+    @_dummyIter @_direction
 
   end: () =>
-    @_dummyIter @_direction()
+    @_dummyIter @_direction
 
   first: () =>
     @begin().next()
 
   last: () =>
-    @begin().prev()
+    @end().prev()
 
   isEmpty: () =>
     @_dummy.isSingle()
@@ -141,36 +127,32 @@ class LinkedList
     @_lenght
 
   reverse: () =>
-    @_reversed = !@_reversed
+    @_direction = @_direction.flip()
     this
 
   prependValue: (val) =>
-    newNode = new _Node val
-    @_prepend newNode
+    @_insertAfter @begin(), val
     this
 
   appendValue: (val) =>
-    newNode = new _Node val
-    @_append newNode
+    @_insertBefore @end(), val
     this
 
   insertValueBefore: (nodeIter, val) =>
     nodeIter.validate()
-    newNode = new _Node val
-    @_insertBefore nodeIter, newNode
+    @_insertBefore nodeIter, val
     this
 
   insertValueAfter: (nodeIter, val) =>
     nodeIter.validate()
-    newNode = new _Node val
-    @_insertAfter nodeIter, newNode
+    @_insertAfter nodeIter, val
     this
 
   prependList: (list) =>
     @insertListAfter @begin(), list
 
   appendList: (list) =>
-    @insertListBefore @begin(), list
+    @insertListBefore @end(), list
 
   insertListBefore: (nodeIter, list) =>
     nodeIter.validate()
@@ -188,7 +170,6 @@ class LinkedList
     @_remove node
     [node.value, next]
 
-
   toArray: () =>
     iter = @begin()
     iter.value() until (iter = iter.next()).isDone()
@@ -196,26 +177,17 @@ class LinkedList
   _dummyIter: (direction) =>
     new _Iterator this, @_dummy, direction
 
-  _createListIterator: (node, isForward) =>
-    iterClass = if @_isListOfListNode node then  _ListOfListIterator else _ListIterator
-    new iterClass(this, node, isForward)
-
   _increaseLength: (x = 1) =>
     @_lenght += x
 
-  _prepend: (newNode) =>
-    @_insertAfter @begin(), newNode
+  _insertBefore: (nextIter, val) =>
+    @_insert nextIter.prev(), val, nextIter
 
-  _append: (newNode) =>
-    @_insertBefore @begin(), newNode
+  _insertAfter: (prevIter, val) =>
+    @_insert prevIter, val, prevIter.next()
 
-  _insertBefore: (nextIter, newNode) =>
-    @_insert nextIter.prev(), newNode, nextIter
-
-  _insertAfter: (prevIter, newNode) =>
-    @_insert prevIter, newNode, prevIter.next()
-
-  _insert: (prevIter, newNode, nextIter) =>
+  _insert: (prevIter, val, nextIter) =>
+    newNode = new _Node val
     d = prevIter._direction
     newNode.clearFlips()
     @_setPrev prevIter, d, newNode
@@ -226,7 +198,7 @@ class LinkedList
     l = list.length()
     switch
       when l is 1
-        @_insert prevIter, list.first()._node, nextIter
+        @_insert prevIter, list.first().value(), nextIter
       when l > 1
         first = list.first()
         last = list.last()
@@ -248,11 +220,8 @@ class LinkedList
     newNode.setNext d, next, flip
     next.setPrev nextIter._direction, newNode, flip
 
-  _direction: () =>
-    if @_reversed then _Direction::backward() else _Direction::forward()
-
   _remove: (node) =>
-    d = @_direction()
+    d = @_direction
     [prev, prevD] = node.prev(d)
     [next, nextD] = node.next(d)
     flip = prevD isnt nextD
