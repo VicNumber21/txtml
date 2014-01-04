@@ -106,7 +106,7 @@ class LinkedList
     @_dummy = new _Node()
     @_direction = _Direction::forward()
     @_lenght = 0
-    @appendValue(val) for val in init
+    @append(val) for val in init
 
   begin: () =>
     @_dummyIter @_direction
@@ -130,22 +130,20 @@ class LinkedList
     @_direction = @_direction.flip()
     this
 
-  prependValue: (val) =>
+  prepend: (val) =>
     @_insertAfter @begin(), val
     this
 
-  appendValue: (val) =>
+  append: (val) =>
     @_insertBefore @end(), val
     this
 
-  insertValueBefore: (nodeIter, val) =>
-    nodeIter.validate()
-    @_insertBefore nodeIter, val
+  insertBefore: (iter, val) =>
+    @_insertBefore iter, val
     this
 
-  insertValueAfter: (nodeIter, val) =>
-    nodeIter.validate()
-    @_insertAfter nodeIter, val
+  insertAfter: (iter, val) =>
+    @_insertAfter iter, val
     this
 
   prependList: (list) =>
@@ -154,19 +152,22 @@ class LinkedList
   appendList: (list) =>
     @insertListBefore @end(), list
 
-  insertListBefore: (nodeIter, list) =>
-    nodeIter.validate()
-    @_insertList nodeIter.prev(), list, nodeIter
+  insertListBefore: (iter, list) =>
+    @_insertList iter.prev(), list, iter
     this
 
-  insertListAfter: (nodeIter, list) =>
-    nodeIter.validate()
-    @_insertList nodeIter, list, nodeIter.next()
+  insertListAfter: (iter, list) =>
+    @_insertList iter, list, iter.next()
     this
 
-  remove: (nodeIter) =>
-    next = nodeIter.next()
-    node = nodeIter._node
+  replace: (iter, newValue) =>
+    oldValue = iter.value()
+    iter._node.value = newValue
+    oldValue
+
+  remove: (iter) =>
+    next = iter.next()
+    node = iter._node
     @_remove node
     [node.value, next]
 

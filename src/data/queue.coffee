@@ -6,7 +6,7 @@ class Queue
     @_list = new List
 
   enqueue: (val) =>
-    @_list.prependValue(val)
+    @_list.prepend(val)
     val
 
   dequeue: () =>

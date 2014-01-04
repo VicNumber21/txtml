@@ -6,7 +6,7 @@ class Stack
     @_list = new List
 
   push: (val) =>
-    @_list.prependValue(val)
+    @_list.prepend(val)
     val
 
   pop: () =>
