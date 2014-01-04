@@ -1,43 +1,43 @@
+_iterate = (iter, acc0, f) ->
+  ctrl = stop: false, acc: acc0, iter: iter
+  ctrl.acc = f ctrl.iter.value(), ctrl until ctrl.stop or (ctrl.iter = ctrl.iter.next()).isDone()
+  ctrl.acc
+
+_new = (s) ->
+  proto = Object.getPrototypeOf s
+  new proto.constructor
+
+
 class CopyIteration
   @foldl = (s, a0, f) ->
-    iter = s.begin()
-    a = a0
-    a = f a, iter.value() until (iter = iter.next()).isDone()
-    a
+    _iterate s.begin(), a0, (x, {acc}) ->
+      f acc, x
 
   @foldr: (s, a0, f) ->
-    iter = s.end()
-    a = a0
-    a = f iter.value(), a until (iter = iter.prev()).isDone()
-    a
+    _iterate s.end().reverse(), a0, (x, {acc}) ->
+      f x, acc
 
   @map: (s, f) ->
-    proto = Object.getPrototypeOf(s)
-
-    CopyIteration.foldl s, new proto.constructor, (a, x) ->
+    CopyIteration.foldl s, _new(s), (a, x) ->
       a.append f x
 
   @rmap: (s, f) ->
-    proto = Object.getPrototypeOf(s)
-
-    CopyIteration.foldr s, new proto.constructor, (x, a) ->
+    CopyIteration.foldr s, _new(s), (x, a) ->
       a.append f x
 
   @forEach: (s, f) ->
     CopyIteration.foldl s, undefined, (a, x) ->
       f x
 
-  @filter: (s, p) ->
-    proto = Object.getPrototypeOf(s)
+    undefined
 
-    CopyIteration.foldl s, new proto.constructor, (a, x) ->
+  @filter: (s, p) ->
+    CopyIteration.foldl s, _new(s), (a, x) ->
       if p x then a.append x else a
 
   @any: (s, p) ->
-    iter = s.begin()
-    found = false
-    found = p iter.value() until found or (iter = iter.next()).isDone()
-    found
+    _iterate s.begin(), false, (x, ctrl) ->
+      ctrl.stop = p x
 
   @all: (s, p) ->
     if s.isEmpty()
@@ -49,8 +49,9 @@ class CopyIteration
 
 class ReplaceIteration extends CopyIteration
   @map: (s, f) ->
-    iter = s.begin()
-    s.replace iter, f iter.value() until (iter = iter.next()).isDone()
+    _iterate s.begin(), undefined, (x, {iter}) ->
+      s.replace iter, f x
+
     s
 
   @filter: (s, p) ->
