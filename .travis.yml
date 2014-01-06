@@ -19,4 +19,4 @@ branches:
     - /^noci*$/i
 env:
   global:
-    secure: SomarYaaj5sHX4Nj0V7bBNDduxHuKE7c1TDtATmayUrm6XE7ALEQJeBXWWy73QzZCOy6Ur9MrJfl5//dpXHqNfvgWyAdbZjs6uMK94lu5O7+uKjDtTmsl/dGeNAE+C7IFoeE4YBRiByhn42wxPFTqDVuEtl+8Hf/Mfep1AdpE6k=
+    secure: Tv8NEIxSjZA8Jq4gt8NBRaSuNHQAXIbL8+QThqFBkZE+P9xPEHssTBF76U7tATZB2y6ouFwwVRMSShuIWNGCx2dcB0NS9LC5PeXoXsaWNVYEbkM9+9Wmq1QeabN4H2FhJoBR1FEP4dt2X00U0h4jh7w50geYDDfdoJ2Kg1w5ZKA=
