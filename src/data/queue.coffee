@@ -1,4 +1,4 @@
-List = require('data/linked-list').LinkedList
+List = require('data/list').List
 
 
 class Queue
@@ -6,7 +6,7 @@ class Queue
     @_list = new List
 
   enqueue: (val) =>
-    @_list.prependValue(val)
+    @_list.prepend(val)
     val
 
   dequeue: () =>

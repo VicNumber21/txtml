@@ -1,4 +1,4 @@
-List = require('data/linked-list').LinkedList
+List = require('data/list').List
 
 
 class Stack
@@ -6,7 +6,7 @@ class Stack
     @_list = new List
 
   push: (val) =>
-    @_list.prependValue(val)
+    @_list.prepend(val)
     val
 
   pop: () =>

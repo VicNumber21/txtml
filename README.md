@@ -53,9 +53,9 @@ A line looks as the following:
 #### Example
 The "Decorator" design patter description may look as the following:
 ```
-Component |>--> Decorator
-ConcreteComponent <--<| Component
-Decorator |>--> ConcreteDecorator
+Component |>-- Decorator
+ConcreteComponent --<| Component
+Decorator |>-- ConcreteDecorator
 Component <--<> Decorator
 ```
 
@@ -65,7 +65,7 @@ concept still).
 
 #### Relationships
 At the moment the following relationships are supported:
-- ```|>-->```, ```<--<|``` - generalization
+- ```|>--```, ```--<|``` - generalization
 - ```<>-->```, ```<--<>``` - aggregation
 - ```<|>-->```, ```<--<|>``` - composition
 - ```- ->```, ```<- -``` - dependency

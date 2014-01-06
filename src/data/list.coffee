@@ -86,9 +86,11 @@ class _Iterator
     throw Error 'Dummy node iterator' if @_isDummy()
     @_node.value
 
+  view: () =>
+    {x: @value()}
+
   reverse: () =>
-    @_direction = @_direction.flip()
-    this
+    new _Iterator @_owner, @_node, @_direction.flip(), @_started
 
   isDone: () =>
     @_started and @_isDummy()
@@ -101,12 +103,12 @@ class _Iterator
     @_owner._dummy is @_node
 
 
-class LinkedList
+class List
   constructor: (init = []) ->
     @_dummy = new _Node()
     @_direction = _Direction::forward()
     @_lenght = 0
-    @appendValue(val) for val in init
+    @append(val) for val in init
 
   begin: () =>
     @_dummyIter @_direction
@@ -128,25 +130,26 @@ class LinkedList
 
   reverse: () =>
     @_direction = @_direction.flip()
-    this
+    @
 
-  prependValue: (val) =>
+  prepend: (val) =>
     @_insertAfter @begin(), val
-    this
+    @
 
-  appendValue: (val) =>
+  append: (val) =>
     @_insertBefore @end(), val
-    this
+    @
 
-  insertValueBefore: (nodeIter, val) =>
-    nodeIter.validate()
-    @_insertBefore nodeIter, val
-    this
+  cumulate: ({x}) =>
+    @append x
 
-  insertValueAfter: (nodeIter, val) =>
-    nodeIter.validate()
-    @_insertAfter nodeIter, val
-    this
+  insertBefore: (iter, val) =>
+    @_insertBefore iter, val
+    @
+
+  insertAfter: (iter, val) =>
+    @_insertAfter iter, val
+    @
 
   prependList: (list) =>
     @insertListAfter @begin(), list
@@ -154,19 +157,22 @@ class LinkedList
   appendList: (list) =>
     @insertListBefore @end(), list
 
-  insertListBefore: (nodeIter, list) =>
-    nodeIter.validate()
-    @_insertList nodeIter.prev(), list, nodeIter
-    this
+  insertListBefore: (iter, list) =>
+    @_insertList iter.prev(), list, iter
+    @
 
-  insertListAfter: (nodeIter, list) =>
-    nodeIter.validate()
-    @_insertList nodeIter, list, nodeIter.next()
-    this
+  insertListAfter: (iter, list) =>
+    @_insertList iter, list, iter.next()
+    @
 
-  remove: (nodeIter) =>
-    next = nodeIter.next()
-    node = nodeIter._node
+  replace: (iter, newValue) =>
+    oldValue = iter.value()
+    iter._node.value = newValue
+    oldValue
+
+  remove: (iter) =>
+    next = iter.next()
+    node = iter._node
     @_remove node
     [node.value, next]
 
@@ -175,7 +181,7 @@ class LinkedList
     iter.value() until (iter = iter.next()).isDone()
 
   _dummyIter: (direction) =>
-    new _Iterator this, @_dummy, direction
+    new _Iterator @, @_dummy, direction
 
   _increaseLength: (x = 1) =>
     @_lenght += x
@@ -230,4 +236,4 @@ class LinkedList
     --@_lenght
 
 
-exports.LinkedList = LinkedList
+exports.List = List
