@@ -86,9 +86,11 @@ class _Iterator
     throw Error 'Dummy node iterator' if @_isDummy()
     @_node.value
 
+  view: () =>
+    {x: @value()}
+
   reverse: () =>
-    @_direction = @_direction.flip()
-    this
+    new _Iterator @_owner, @_node, @_direction.flip(), @_started
 
   isDone: () =>
     @_started and @_isDummy()
@@ -128,23 +130,26 @@ class LinkedList
 
   reverse: () =>
     @_direction = @_direction.flip()
-    this
+    @
 
   prepend: (val) =>
     @_insertAfter @begin(), val
-    this
+    @
 
   append: (val) =>
     @_insertBefore @end(), val
-    this
+    @
+
+  cumulate: ({x}) =>
+    @append x
 
   insertBefore: (iter, val) =>
     @_insertBefore iter, val
-    this
+    @
 
   insertAfter: (iter, val) =>
     @_insertAfter iter, val
-    this
+    @
 
   prependList: (list) =>
     @insertListAfter @begin(), list
@@ -154,11 +159,11 @@ class LinkedList
 
   insertListBefore: (iter, list) =>
     @_insertList iter.prev(), list, iter
-    this
+    @
 
   insertListAfter: (iter, list) =>
     @_insertList iter, list, iter.next()
-    this
+    @
 
   replace: (iter, newValue) =>
     oldValue = iter.value()
@@ -176,7 +181,7 @@ class LinkedList
     iter.value() until (iter = iter.next()).isDone()
 
   _dummyIter: (direction) =>
-    new _Iterator this, @_dummy, direction
+    new _Iterator @, @_dummy, direction
 
   _increaseLength: (x = 1) =>
     @_lenght += x

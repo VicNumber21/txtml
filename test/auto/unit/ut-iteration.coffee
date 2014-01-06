@@ -5,28 +5,28 @@ describe 'Iteration:', ->
 
       it 'should return a0 iterating through empty list', ->
         test_list = new LinkedList
-        a = foldl test_list, 4, (a, x) ->
+        a = foldl test_list, 4, (a, {x}) ->
           x - a
 
         expect(a).to.be.equal 4
 
       it 'should return a0 iterating through empty array', ->
         test_array = []
-        a = foldl test_array, 4, (a, x) ->
+        a = foldl test_array, 4, (a, {x}) ->
           x - a
 
         expect(a).to.be.equal 4
 
       it 'should return correct value iterating through non-empty list', ->
         test_list = new LinkedList [10, -3]
-        a = foldl test_list, 4, (a, x) ->
+        a = foldl test_list, 4, (a, {x}) ->
           x - a
 
         expect(a).to.be.equal -9
 
       it 'should return correct value iterating through non-empty array', ->
         test_array = [10, -3]
-        a = foldl test_array, 4, (a, x) ->
+        a = foldl test_array, 4, (a, {x}) ->
           x - a
 
         expect(a).to.be.equal -9
@@ -36,28 +36,28 @@ describe 'Iteration:', ->
 
       it 'should return a0 iterating through empty list', ->
         test_list = new LinkedList
-        a = foldr test_list, 4, (x, a) ->
+        a = foldr test_list, 4, ({x}, a) ->
           x - a
 
         expect(a).to.be.equal 4
 
       it 'should return a0 iterating through empty array', ->
         test_array = []
-        a = foldr test_array, 4, (x, a) ->
+        a = foldr test_array, 4, ({x}, a) ->
           x - a
 
         expect(a).to.be.equal 4
 
       it 'should return correct value iterating through non-empty list', ->
         test_list = new LinkedList [10, -3]
-        a = foldr test_list, 4, (x, a) ->
+        a = foldr test_list, 4, ({x}, a) ->
           x - a
 
         expect(a).to.be.equal 17
 
       it 'should return correct value iterating through non-empty array', ->
         test_array = [10, -3]
-        a = foldr test_array, 4, (x, a) ->
+        a = foldr test_array, 4, ({x}, a) ->
           x - a
 
         expect(a).to.be.equal 17
@@ -67,7 +67,7 @@ describe 'Iteration:', ->
 
       it 'should return empty list iterating through empty list', ->
         test_list = new LinkedList
-        r = map test_list, (x) ->
+        r = map test_list, ({x}) ->
           -x
 
         expect(r.toArray()).to.be.eql []
@@ -75,7 +75,7 @@ describe 'Iteration:', ->
 
       it 'should return empty array iterating through empty array', ->
         test_array = []
-        r = map test_array, (x) ->
+        r = map test_array, ({x}) ->
           -x
 
         expect(r).to.be.eql []
@@ -83,7 +83,7 @@ describe 'Iteration:', ->
 
       it 'should return correct value iterating through non-empty list', ->
         test_list = new LinkedList [10, -3]
-        r = map test_list, (x) ->
+        r = map test_list, ({x}) ->
           -x
 
         expect(r.toArray()).to.be.eql [-10, 3]
@@ -91,7 +91,7 @@ describe 'Iteration:', ->
 
       it 'should return correct value iterating through non-empty array', ->
         test_array = [10, -3]
-        r = map test_array, (x) ->
+        r = map test_array, ({x}) ->
           -x
 
         expect(r).to.be.eql [-10, 3]
@@ -102,7 +102,7 @@ describe 'Iteration:', ->
 
       it 'should return empty list iterating through empty list', ->
         test_list = new LinkedList
-        r = rmap test_list, (x) ->
+        r = rmap test_list, ({x}) ->
           -x
 
         expect(r.toArray()).to.be.eql []
@@ -110,7 +110,7 @@ describe 'Iteration:', ->
 
       it 'should return empty array iterating through empty array', ->
         test_array = []
-        r = rmap test_array, (x) ->
+        r = rmap test_array, ({x}) ->
           -x
 
         expect(r).to.be.eql []
@@ -118,7 +118,7 @@ describe 'Iteration:', ->
 
       it 'should return correct value iterating through non-empty list', ->
         test_list = new LinkedList [10, -3]
-        r = rmap test_list, (x) ->
+        r = rmap test_list, ({x}) ->
           -x
 
         expect(r.toArray()).to.be.eql [3, -10]
@@ -126,7 +126,7 @@ describe 'Iteration:', ->
 
       it 'should return correct value iterating through non-empty array', ->
         test_array = [10, -3]
-        r = rmap test_array, (x) ->
+        r = rmap test_array, ({x}) ->
           -x
 
         expect(r).to.be.eql [3, -10]
@@ -138,7 +138,7 @@ describe 'Iteration:', ->
       it 'should not perform callback iterating through empty list', ->
         test_list = new LinkedList
         r = []
-        forEach test_list, (x) ->
+        forEach test_list, ({x}) ->
           r.push(x)
 
         expect(r).to.be.eql []
@@ -146,7 +146,7 @@ describe 'Iteration:', ->
       it 'should not perform callback iterating through empty array', ->
         test_array = []
         r = []
-        forEach test_array, (x) ->
+        forEach test_array, ({x}) ->
           r.push(x)
 
         expect(r).to.be.eql []
@@ -154,7 +154,7 @@ describe 'Iteration:', ->
       it 'should perform callback iterating through non-empty list', ->
         test_list = new LinkedList [10, -3]
         r = []
-        forEach test_list, (x) ->
+        forEach test_list, ({x}) ->
           r.push(x)
 
         expect(r).to.be.eql [10, -3]
@@ -165,14 +165,14 @@ describe 'Iteration:', ->
         forEach test_array, (x) ->
           r.push(x)
 
-        expect(r).to.be.eql [10, -3]
+        expect(r).to.be.eql [{idx: 0, x: 10}, {idx: 1, x: -3}]
 
     describe 'filter', ->
       filter = Iteration.Copy.filter
 
       it 'should return empty list iterating through empty list', ->
         test_list = new LinkedList
-        r = filter test_list, (x) ->
+        r = filter test_list, ({x}) ->
           x > 0
 
         expect(r.toArray()).to.be.eql []
@@ -180,7 +180,7 @@ describe 'Iteration:', ->
 
       it 'should return empty array iterating through empty array', ->
         test_array = []
-        r = filter test_array, (x) ->
+        r = filter test_array, ({x}) ->
           x > 0
 
         expect(r).to.be.eql []
@@ -188,7 +188,7 @@ describe 'Iteration:', ->
 
       it 'should return correct value iterating through non-empty list', ->
         test_list = new LinkedList [10, -3]
-        r = filter test_list, (x) ->
+        r = filter test_list, ({x}) ->
           x > 0
 
         expect(r.toArray()).to.be.eql [10]
@@ -196,7 +196,7 @@ describe 'Iteration:', ->
 
       it 'should return correct value iterating through non-empty array', ->
         test_array = [10, -3]
-        r = filter test_array, (x) ->
+        r = filter test_array, ({x}) ->
           x < 0
 
         expect(r).to.be.eql [-3]
@@ -207,32 +207,32 @@ describe 'Iteration:', ->
 
       it 'should return false through empty list', ->
         test_list = new LinkedList
-        p = (x) ->
+        p = ({x}) ->
           x > 0
         expect(any test_list, p).to.be.false
 
       it 'should return false through empty array', ->
         test_array = []
-        p = (x) ->
+        p = ({x}) ->
           x > 0
         expect(any test_array, p).to.be.false
 
       it 'should return correct value iterating through non-empty list', ->
         test_list = new LinkedList [10, -3]
-        p = (x) ->
+        p = ({x}) ->
           x > 0
         expect(any test_list, p).to.be.true
 
       it 'should return correct value iterating through non-empty array', ->
         test_array = [10, -3]
-        p = (x) ->
+        p = ({x}) ->
           x > 10
         expect(any test_array, p).to.be.false
 
       it 'should stop iterationg once result found', ->
         test_list = new LinkedList [10, -3, 5, -7]
         count = 0
-        p = (x) ->
+        p = ({x}) ->
           ++count
           x < 0
         expect(any test_list, p).to.be.true
@@ -243,32 +243,32 @@ describe 'Iteration:', ->
 
       it 'should return false through empty list', ->
         test_list = new LinkedList
-        p = (x) ->
+        p = ({x}) ->
           x > 0
         expect(all test_list, p).to.be.false
 
       it 'should return false through empty array', ->
         test_array = []
-        p = (x) ->
+        p = ({x}) ->
           x > 0
         expect(all test_array, p).to.be.false
 
       it 'should return correct value iterating through non-empty list', ->
         test_list = new LinkedList [10, -3]
-        p = (x) ->
+        p = ({x}) ->
           x > 0
         expect(all test_list, p).to.be.false
 
       it 'should return correct value iterating through non-empty array', ->
         test_array = [10, -3]
-        p = (x) ->
+        p = ({x}) ->
           x > -10
         expect(all test_array, p).to.be.true
 
       it 'should stop iterationg once result found', ->
         test_list = new LinkedList [10, -3, 5, -7]
         count = 0
-        p = (x) ->
+        p = ({x}) ->
           ++count
           x > 0
         expect(all test_list, p).to.be.false
@@ -280,7 +280,7 @@ describe 'Iteration:', ->
 
       it 'should return empty list iterating through empty list', ->
         test_list = new LinkedList
-        r = map test_list, (x) ->
+        r = map test_list, ({x}) ->
           -x
 
         expect(r.toArray()).to.be.eql []
@@ -288,7 +288,7 @@ describe 'Iteration:', ->
 
       it 'should return empty array iterating through empty array', ->
         test_array = []
-        r = map test_array, (x) ->
+        r = map test_array, ({x}) ->
           -x
 
         expect(r).to.be.eql []
@@ -296,7 +296,7 @@ describe 'Iteration:', ->
 
       it 'should return correct value iterating through non-empty list', ->
         test_list = new LinkedList [10, -3]
-        r = map test_list, (x) ->
+        r = map test_list, ({x}) ->
           -x
 
         expect(r.toArray()).to.be.eql [-10, 3]
@@ -304,7 +304,7 @@ describe 'Iteration:', ->
 
       it 'should return correct value iterating through non-empty array', ->
         test_array = [10, -3]
-        r = map test_array, (x) ->
+        r = map test_array, ({x}) ->
           -x
 
         expect(r).to.be.eql [-10, 3]
@@ -315,7 +315,7 @@ describe 'Iteration:', ->
 
       it 'should return empty list iterating through empty list', ->
         test_list = new LinkedList
-        r = filter test_list, (x) ->
+        r = filter test_list, ({x}) ->
           x > 0
 
         expect(r.toArray()).to.be.eql []
@@ -323,7 +323,7 @@ describe 'Iteration:', ->
 
       it 'should return empty array iterating through empty array', ->
         test_array = []
-        r = filter test_array, (x) ->
+        r = filter test_array, ({x}) ->
           x > 0
 
         expect(r).to.be.eql []
@@ -331,7 +331,7 @@ describe 'Iteration:', ->
 
       it 'should return correct value iterating through non-empty list', ->
         test_list = new LinkedList [10, -3]
-        r = filter test_list, (x) ->
+        r = filter test_list, ({x}) ->
           x > 0
 
         expect(r.toArray()).to.be.eql [10]
@@ -339,7 +339,7 @@ describe 'Iteration:', ->
 
       it 'should return correct value iterating through non-empty array', ->
         test_array = [10, -3]
-        r = filter test_array, (x) ->
+        r = filter test_array, ({x}) ->
           x < 0
 
         expect(r).to.be.eql [-3]

@@ -16,6 +16,9 @@ class _Iterator
   value: () =>
     @_owner[@_idx]
 
+  view: () =>
+    {idx: @_idx, x: @_owner[@_idx]}
+
   reverse: () =>
     new _Iterator @_owner, @_idx , -@_step
 
@@ -32,7 +35,7 @@ Array::first = () ->
 Array::last = () ->
   @end().prev()
 
-Array::append = (x) ->
+Array::cumulate = ({x}) ->
   @push x
   @
 

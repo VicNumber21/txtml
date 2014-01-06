@@ -1,6 +1,6 @@
 _iterate = (iter, acc0, f) ->
   ctrl = stop: false, acc: acc0, iter: iter
-  ctrl.acc = f ctrl.iter.value(), ctrl until ctrl.stop or (ctrl.iter = ctrl.iter.next()).isDone()
+  ctrl.acc = f ctrl.iter.view(), ctrl until ctrl.stop or (ctrl.iter = ctrl.iter.next()).isDone()
   ctrl.acc
 
 _new = (s) ->
@@ -10,47 +10,49 @@ _new = (s) ->
 
 class CopyIteration
   @foldl = (s, a0, f) ->
-    _iterate s.begin(), a0, (x, {acc}) ->
-      f acc, x
+    _iterate s.begin(), a0, (view, {acc}) ->
+      f acc, view
 
   @foldr: (s, a0, f) ->
-    _iterate s.end().reverse(), a0, (x, {acc}) ->
-      f x, acc
+    _iterate s.end().reverse(), a0, (view, {acc}) ->
+      f view, acc
 
   @map: (s, f) ->
-    CopyIteration.foldl s, _new(s), (a, x) ->
-      a.append f x
+    CopyIteration.foldl s, _new(s), (a, view) ->
+      view.x = f view
+      a.cumulate view
 
   @rmap: (s, f) ->
-    CopyIteration.foldr s, _new(s), (x, a) ->
-      a.append f x
+    CopyIteration.foldr s, _new(s), (view, a) ->
+      view.x = f view
+      a.cumulate view
 
   @forEach: (s, f) ->
-    CopyIteration.foldl s, undefined, (a, x) ->
-      f x
+    CopyIteration.foldl s, undefined, (a, view) ->
+      f view
 
     undefined
 
   @filter: (s, p) ->
-    CopyIteration.foldl s, _new(s), (a, x) ->
-      if p x then a.append x else a
+    CopyIteration.foldl s, _new(s), (a, view) ->
+      if p view then a.cumulate view else a
 
   @any: (s, p) ->
-    _iterate s.begin(), false, (x, ctrl) ->
-      ctrl.stop = p x
+    _iterate s.begin(), false, (view, ctrl) ->
+      ctrl.stop = p view
 
   @all: (s, p) ->
     if s.isEmpty()
       false
     else
-      not CopyIteration.any s, (x) ->
-        not p x
+      not CopyIteration.any s, (view) ->
+        not p view
 
 
 class ReplaceIteration extends CopyIteration
   @map: (s, f) ->
-    _iterate s.begin(), undefined, (x, {iter}) ->
-      s.replace iter, f x
+    _iterate s.begin(), undefined, (view, {iter}) ->
+      s.replace iter, f view
 
     s
 
@@ -58,7 +60,7 @@ class ReplaceIteration extends CopyIteration
     iter = s.first()
 
     until iter.isDone()
-      if p iter.value()
+      if p iter.view()
         iter = iter.next()
       else
         [_, iter] = s.remove iter
