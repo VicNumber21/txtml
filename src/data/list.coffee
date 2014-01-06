@@ -103,7 +103,7 @@ class _Iterator
     @_owner._dummy is @_node
 
 
-class LinkedList
+class List
   constructor: (init = []) ->
     @_dummy = new _Node()
     @_direction = _Direction::forward()
@@ -236,4 +236,4 @@ class LinkedList
     --@_lenght
 
 
-exports.LinkedList = LinkedList
+exports.List = List

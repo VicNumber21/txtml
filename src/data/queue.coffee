@@ -1,4 +1,4 @@
-List = require('data/linked-list').LinkedList
+List = require('data/list').List
 
 
 class Queue

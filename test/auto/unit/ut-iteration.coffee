@@ -4,7 +4,7 @@ describe 'Iteration:', ->
       foldl = Iteration.Copy.foldl
 
       it 'should return a0 iterating through empty list', ->
-        test_list = new LinkedList
+        test_list = new List
         a = foldl test_list, 4, (a, {x}) ->
           x - a
 
@@ -18,7 +18,7 @@ describe 'Iteration:', ->
         expect(a).to.be.equal 4
 
       it 'should return correct value iterating through non-empty list', ->
-        test_list = new LinkedList [10, -3]
+        test_list = new List [10, -3]
         a = foldl test_list, 4, (a, {x}) ->
           x - a
 
@@ -35,7 +35,7 @@ describe 'Iteration:', ->
       foldr = Iteration.Copy.foldr
 
       it 'should return a0 iterating through empty list', ->
-        test_list = new LinkedList
+        test_list = new List
         a = foldr test_list, 4, ({x}, a) ->
           x - a
 
@@ -49,7 +49,7 @@ describe 'Iteration:', ->
         expect(a).to.be.equal 4
 
       it 'should return correct value iterating through non-empty list', ->
-        test_list = new LinkedList [10, -3]
+        test_list = new List [10, -3]
         a = foldr test_list, 4, ({x}, a) ->
           x - a
 
@@ -66,7 +66,7 @@ describe 'Iteration:', ->
       map = Iteration.Copy.map
 
       it 'should return empty list iterating through empty list', ->
-        test_list = new LinkedList
+        test_list = new List
         r = map test_list, ({x}) ->
           -x
 
@@ -82,7 +82,7 @@ describe 'Iteration:', ->
         expect(r).to.be.not.equal test_array
 
       it 'should return correct value iterating through non-empty list', ->
-        test_list = new LinkedList [10, -3]
+        test_list = new List [10, -3]
         r = map test_list, ({x}) ->
           -x
 
@@ -101,7 +101,7 @@ describe 'Iteration:', ->
       rmap = Iteration.Copy.rmap
 
       it 'should return empty list iterating through empty list', ->
-        test_list = new LinkedList
+        test_list = new List
         r = rmap test_list, ({x}) ->
           -x
 
@@ -117,7 +117,7 @@ describe 'Iteration:', ->
         expect(r).to.be.not.equal test_array
 
       it 'should return correct value iterating through non-empty list', ->
-        test_list = new LinkedList [10, -3]
+        test_list = new List [10, -3]
         r = rmap test_list, ({x}) ->
           -x
 
@@ -136,7 +136,7 @@ describe 'Iteration:', ->
       forEach = Iteration.Copy.forEach
 
       it 'should not perform callback iterating through empty list', ->
-        test_list = new LinkedList
+        test_list = new List
         r = []
         forEach test_list, ({x}) ->
           r.push(x)
@@ -152,7 +152,7 @@ describe 'Iteration:', ->
         expect(r).to.be.eql []
 
       it 'should perform callback iterating through non-empty list', ->
-        test_list = new LinkedList [10, -3]
+        test_list = new List [10, -3]
         r = []
         forEach test_list, ({x}) ->
           r.push(x)
@@ -171,7 +171,7 @@ describe 'Iteration:', ->
       filter = Iteration.Copy.filter
 
       it 'should return empty list iterating through empty list', ->
-        test_list = new LinkedList
+        test_list = new List
         r = filter test_list, ({x}) ->
           x > 0
 
@@ -187,7 +187,7 @@ describe 'Iteration:', ->
         expect(r).to.be.not.equal test_array
 
       it 'should return correct value iterating through non-empty list', ->
-        test_list = new LinkedList [10, -3]
+        test_list = new List [10, -3]
         r = filter test_list, ({x}) ->
           x > 0
 
@@ -206,7 +206,7 @@ describe 'Iteration:', ->
       any = Iteration.Copy.any
 
       it 'should return false through empty list', ->
-        test_list = new LinkedList
+        test_list = new List
         p = ({x}) ->
           x > 0
         expect(any test_list, p).to.be.false
@@ -218,7 +218,7 @@ describe 'Iteration:', ->
         expect(any test_array, p).to.be.false
 
       it 'should return correct value iterating through non-empty list', ->
-        test_list = new LinkedList [10, -3]
+        test_list = new List [10, -3]
         p = ({x}) ->
           x > 0
         expect(any test_list, p).to.be.true
@@ -230,7 +230,7 @@ describe 'Iteration:', ->
         expect(any test_array, p).to.be.false
 
       it 'should stop iterationg once result found', ->
-        test_list = new LinkedList [10, -3, 5, -7]
+        test_list = new List [10, -3, 5, -7]
         count = 0
         p = ({x}) ->
           ++count
@@ -242,7 +242,7 @@ describe 'Iteration:', ->
       all = Iteration.Copy.all
 
       it 'should return false through empty list', ->
-        test_list = new LinkedList
+        test_list = new List
         p = ({x}) ->
           x > 0
         expect(all test_list, p).to.be.false
@@ -254,7 +254,7 @@ describe 'Iteration:', ->
         expect(all test_array, p).to.be.false
 
       it 'should return correct value iterating through non-empty list', ->
-        test_list = new LinkedList [10, -3]
+        test_list = new List [10, -3]
         p = ({x}) ->
           x > 0
         expect(all test_list, p).to.be.false
@@ -266,7 +266,7 @@ describe 'Iteration:', ->
         expect(all test_array, p).to.be.true
 
       it 'should stop iterationg once result found', ->
-        test_list = new LinkedList [10, -3, 5, -7]
+        test_list = new List [10, -3, 5, -7]
         count = 0
         p = ({x}) ->
           ++count
@@ -279,7 +279,7 @@ describe 'Iteration:', ->
       map = Iteration.Replace.map
 
       it 'should return empty list iterating through empty list', ->
-        test_list = new LinkedList
+        test_list = new List
         r = map test_list, ({x}) ->
           -x
 
@@ -295,7 +295,7 @@ describe 'Iteration:', ->
         expect(r).to.be.equal test_array
 
       it 'should return correct value iterating through non-empty list', ->
-        test_list = new LinkedList [10, -3]
+        test_list = new List [10, -3]
         r = map test_list, ({x}) ->
           -x
 
@@ -314,7 +314,7 @@ describe 'Iteration:', ->
       filter = Iteration.Replace.filter
 
       it 'should return empty list iterating through empty list', ->
-        test_list = new LinkedList
+        test_list = new List
         r = filter test_list, ({x}) ->
           x > 0
 
@@ -330,7 +330,7 @@ describe 'Iteration:', ->
         expect(r).to.be.equal test_array
 
       it 'should return correct value iterating through non-empty list', ->
-        test_list = new LinkedList [10, -3]
+        test_list = new List [10, -3]
         r = filter test_list, ({x}) ->
           x > 0
 
