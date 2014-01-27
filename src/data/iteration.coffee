@@ -1,11 +1,9 @@
+_new = require('data/util').new
+
 _iterate = (iter, acc0, f) ->
   ctrl = stop: false, acc: acc0, iter: iter
   ctrl.acc = f ctrl.iter.view(), ctrl until ctrl.stop or (ctrl.iter = ctrl.iter.next()).isDone()
   ctrl.acc
-
-_new = (s) ->
-  proto = Object.getPrototypeOf s
-  new proto.constructor
 
 
 class CopyIteration
