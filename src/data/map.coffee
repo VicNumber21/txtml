@@ -1,4 +1,4 @@
-foldl = require('data/iteration').Copy.foldl
+iteration = require('data/iteration').Copy
 clone = require('data/util').clone
 
 
@@ -88,15 +88,6 @@ class Map
     {hash} = toKey key
     @_get hash
 
-  _get: (hash) =>
-    @_hashTable[hash]?.x
-
-  _key: (hash) =>
-    @_hashTable[hash]?.key
-
-  _onModification: () =>
-    delete @_hashCache
-
   set: (key, x) =>
     {key, hash} = toKey key
     @_hashTable[hash] = {key: key, x: x}
@@ -114,12 +105,13 @@ class Map
     {hash} = toKey key
     @_hashTable[hash] isnt undefined
 
-  _hashes: () =>
-    @_hashCache = Object.keys(@_hashTable) unless @_hashCache?
-    @_hashCache
-
   keys: () =>
-    #TODO
+    iteration.map @._hashes(), ({x}) =>
+      @._key x
+
+  values: () =>
+    iteration.map @._hashes(), ({x}) =>
+      @._get x
 
   begin: () =>
     new _Iterator @, @_hashes(), -1
@@ -141,7 +133,7 @@ class Map
     @length() is 0
 
   toArray: () =>
-    foldl @, [], (acc, view) ->
+    iteration.foldl @, [], (acc, view) ->
       acc.push view
       acc
 
@@ -150,6 +142,19 @@ class Map
 
   replace: (iter, x) =>
     @set iter.key(), x
+
+  _get: (hash) =>
+    @_hashTable[hash]?.x
+
+  _key: (hash) =>
+    @_hashTable[hash]?.key
+
+  _hashes: () =>
+    @_hashCache = Object.keys(@_hashTable) unless @_hashCache?
+    @_hashCache
+
+  _onModification: () =>
+    delete @_hashCache
 
 
 exports.Map = Map

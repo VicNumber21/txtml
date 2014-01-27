@@ -147,6 +147,55 @@ describe 'Map:', ->
       fn = () -> test_map.contains {}
       expect(fn).to.throw /Invalid key/
 
+  describe 'Keys', ->
+    it 'should return empty array if the map is empty', ->
+      test_map = new Map
+      expect(test_map.keys()).to.be.eql []
+
+    it 'should return key clones if the map is not empty', ->
+      test_key = new TestKey 1
+      test_map = new Map [{key: 1, x: 4},
+                           {key: '5', x: 'test'},
+                           {key: test_key, x: null},
+                           {key: 4, x: undefined}]
+
+      keys = test_map.keys()
+
+      expect(keys.length).to.be.equal 4
+
+      k = keys.concat([1, '5', test_key, 4])
+      k.sort()
+      not_expected_keys = []
+
+      for i in [0..7] by 2 when k[i] isnt k[i + 1] and (not k[i]._hash or k[i]._hash isnt k[i + 1]._hash)
+        not_expected_keys.push [k[i], k[i + 1]]
+
+      expect(not_expected_keys).to.be.eql []
+
+  describe 'Values', ->
+    it 'should return empty array if the map is empty', ->
+      test_map = new Map
+      expect(test_map.values()).to.be.eql []
+
+    it 'should return values if the map is not empty', ->
+      test_key = new TestKey 1
+      test_map = new Map [{key: 1, x: 4},
+                           {key: '1', x: 'test'},
+                           {key: test_key, x: test_key},
+                           {key: 4, x: 9}]
+
+      values = test_map.values()
+      expect(values.length).to.be.equal 4
+
+      v = values.concat [4, 'test', test_key, 9]
+      v.sort()
+      not_expected_values = []
+
+      for i in [0..7] by 2 when v[i] isnt v[i + 1]
+        not_expected_values.push [v[i], v[i + 1]]
+
+      expect(not_expected_values).to.be.eql []
+
   describe 'Iterator:', ->
     it 'key() should return initial keys instead of internal ones', ->
       test_key = new TestKey
