@@ -1,55 +1,82 @@
 foldl = require('data/iteration').Copy.foldl
+clone = require('data/util').clone
+
 
 class _Iterator
-  constructor: (@_owner, @_keys, @_idx, @_step = 1) ->
+  constructor: (@_owner, @_hashes, @_idx, @_step = 1) ->
 
   prev: () =>
-    new _Iterator @_owner, @_keys, @_idx - @_step, @_step
+    new _Iterator @_owner, @_hashes, @_idx - @_step, @_step
 
   next: () =>
-    new _Iterator @_owner, @_keys, @_idx + @_step, @_step
+    new _Iterator @_owner, @_hashes, @_idx + @_step, @_step
 
   isDone: () =>
     if @_step > 0
-      @_idx >= @_keys.length
+      @_idx >= @_hashes.length
     else
       @_idx < 0
 
+  _hash: () =>
+    @_hashes[@_idx]
+
   key: () =>
-    @_keys[@_idx]
+    @_owner._key @_hash()
 
   value: () =>
-    @_owner._get @key()
+    @_owner._get @_hash()
 
   view: () =>
     key = @key()
     {key: key, x: @_owner._get key}
 
   reverse: () =>
-    new _Iterator @_owner, @_keys, @_idx , -@_step
+    new _Iterator @_owner, @_hashes, @_idx , -@_step
 
   _removed: () =>
-    @_keys.splice @_idx, 1
+    @_hashes.splice @_idx, 1
     @
 
 
+throwInvalidKey = () ->
+  throw new Error 'Invalid key'
+
+isSimple = (simple) ->
+  type = typeof simple
+  type is 'number' or type is 'string'
+
+isIter = (obj) ->
+  obj.prev? and obj.next? and obj.key? and obj.value? and obj.view?
+
+isObject = (obj) ->
+  obj? and (typeof obj is 'object')
+
+iterToKey = (iter) ->
+  {key: iter.key(), hash: iter._hash(), iter: iter}
+
+simpleToKey = (simple) ->
+  {key:simple, hash: (typeof simple) + '_' + simple}
+
+objectToKey = (obj) ->
+  if typeof obj.hash is 'function'
+    hash = obj.hash()
+    throwInvalidKey() unless isSimple hash
+    key = clone(obj)
+    key.hash = () -> hash
+    {key: key, hash: 'object_' + simpleToKey(hash).hash}
+  else
+    throwInvalidKey() unless isSimple hash
+
 toKey = (iterOrKey) ->
-  ik = iterOrKey
-  type = typeof ik
-  type2 = ''
-  isObject = ik? and (type is 'object')
-  iter = ik if isObject and ik.prev? and ik.next? and ik.key? and ik.value? and ik.view?
-
-  key = if iter?
-          iter.key()
-        else
-          ik = ik.hash() if isObject and (typeof ik.hash is 'function')
-          keyType = typeof ik
-          type2 = keyType + '_' if isObject
-          type + '_' + type2 + ik if keyType is 'number' or keyType is 'string'
-
-  throw new Error 'Invalid key' unless key?
-  {key: key, iter: iter}
+  if isSimple(iterOrKey)
+    simpleToKey(iterOrKey)
+  else if isObject(iterOrKey)
+    if isIter(iterOrKey)
+      iterToKey(iterOrKey)
+    else
+      objectToKey(iterOrKey)
+  else
+    throwInvalidKey()
 
 
 class Map
@@ -58,41 +85,47 @@ class Map
     @set key, x for {key, x} in init
 
   get: (key) =>
-    {key} = toKey key
-    @_get key
+    {hash} = toKey key
+    @_get hash
 
-  _get: (key) =>
-    @_hashTable[key]?[0]
+  _get: (hash) =>
+    @_hashTable[hash]?.x
+
+  _key: (hash) =>
+    @_hashTable[hash]?.key
 
   _onModification: () =>
-    delete @_keysCache
+    delete @_hashCache
 
-  set: (key, value) =>
-    {key} = toKey key
-    @_hashTable[key] = [value]
+  set: (key, x) =>
+    {key, hash} = toKey key
+    @_hashTable[hash] = {key: key, x: x}
     @_onModification()
     @
 
   remove: (iterOrKey) =>
-    {key, iter} = toKey iterOrKey
-    value = @_get key
-    delete @_hashTable[key]
+    {hash, iter} = toKey iterOrKey
+    x = @_get hash
+    delete @_hashTable[hash]
     @_onModification()
-    if iter? then [value, iter._removed()] else value
+    if iter? then [x, iter._removed()] else x
 
   contains: (key) =>
-    {key} = toKey key
-    @_hashTable[key] isnt undefined
+    {hash} = toKey key
+    @_hashTable[hash] isnt undefined
 
-  _keys: () =>
-    @_keysCache = Object.keys(@_hashTable) unless @_keysCache?
-    @_keysCache
+  _hashes: () =>
+    @_hashCache = Object.keys(@_hashTable) unless @_hashCache?
+    @_hashCache
+
+  keys: () =>
+    #TODO
 
   begin: () =>
-    new _Iterator @, @_keys(), -1
+    new _Iterator @, @_hashes(), -1
 
   end: () =>
-    keys = @_keys()
+    keys = @_hashes()
     new _Iterator @, keys, keys.length
 
   first: () =>
@@ -102,7 +135,7 @@ class Map
     @end().prev()
 
   length: () =>
-    @_keys().length
+    @_hashes().length
 
   isEmpty: () =>
     @length() is 0

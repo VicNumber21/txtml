@@ -135,7 +135,7 @@ describe 'Map:', ->
     it 'should return false if the key is not found', ->
       test_map = new Map [{key: 1, x: 4},
                           {key: '1', x: 'test'},
-                          {key: new TestKey 1, x: null},
+                          {key: (new TestKey 1), x: null},
                           {key: 4, x: undefined}]
 
       expect(test_map.contains 2).to.be.false
@@ -147,3 +147,47 @@ describe 'Map:', ->
       fn = () -> test_map.contains {}
       expect(fn).to.throw /Invalid key/
 
+  describe 'Iterator:', ->
+    it 'key() should return initial keys instead of internal ones', ->
+      test_key = new TestKey
+      test_map = new Map [{key: 1, x: 4},
+                          {key: '1', x: 'test'},
+                          {key: test_key, x: null},
+                          {key: 4, x: undefined}]
+
+      keys = [1, '1', 4]
+      objectFound = false
+      iter = test_map.begin()
+
+      until (iter = iter.next()).isDone()
+        currentKey = iter.key()
+
+        if typeof currentKey is 'object'
+          objectFound = true
+          currentKey = currentKey.hash()
+
+        expect(keys).to.contain currentKey
+
+      expect(objectFound).to.be.true
+
+    it 'view() should return initial keys instead of internal ones', ->
+      test_key = new TestKey
+      test_map = new Map [{key: 1, x: 4},
+                          {key: '1', x: 'test'},
+                          {key: test_key, x: null},
+                          {key: 4, x: undefined}]
+
+      keys = [1, '1', 4]
+      objectFound = false
+      iter = test_map.begin()
+
+      until (iter = iter.next()).isDone()
+        currentKey = iter.view().key
+
+        if typeof currentKey is 'object'
+          objectFound = true
+          currentKey = currentKey.hash()
+
+        expect(keys).to.contain currentKey
+
+      expect(objectFound).to.be.true
