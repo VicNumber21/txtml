@@ -54,7 +54,8 @@ module.exports = function(grunt) {
 
     coffee: {
       options: {
-        bare: true
+        bare: true,
+        sourceMap: true
       },
       compile: {
         files: [{
