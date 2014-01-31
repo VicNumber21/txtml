@@ -29,10 +29,14 @@ module.exports = function(grunt) {
   var contains = function(arr, elem) {
     return (arr.indexOf(elem) != -1);
   };
-  var git = function (done, args, handler) {
+  var git = function (done, args, handler, supress_error) {
     spawn({cmd: 'git', 'args': args}, function(error, result, code) {
       if (code !== 0) {
-        grunt.warn(error, code);
+        if (supress_error) {
+          console.log('suppressed git error:\n' + error);
+        } else {
+          grunt.warn(error, code);
+        }
       } else {
         console.log('git output:\n' + result.stdout);
       }
@@ -44,6 +48,7 @@ module.exports = function(grunt) {
       done();
     });
   };
+  var publish_repo = 'origin'
 
   grunt.initConfig({
     pkg: pkg,
@@ -270,15 +275,15 @@ module.exports = function(grunt) {
   grunt.registerTask('_push_version', ['_push_commit', '_push_tag', '_remove_feature_branch']);
 
   grunt.registerTask('_push_commit', function() {
-    git(this.async(), ['push', '--prune', 'publish', 'develop']);
+    git(this.async(), ['push', '--prune', publish_repo, 'develop']);
   });
 
   grunt.registerTask('_push_tag', function() {
-    git(this.async(), ['push', 'publish', toTag(version)]);
+    git(this.async(), ['push', publish_repo, toTag(version)]);
   });
 
   grunt.registerTask('_remove_feature_branch', function() {
-    git(this.async(), ['push', 'publish', '--delete', feature_branch]);
+    git(this.async(), ['push', publish_repo, '--delete', feature_branch], null, true);
   });
 
   grunt.registerTask('_next_version', function() {
