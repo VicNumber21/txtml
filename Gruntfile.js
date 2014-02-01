@@ -67,7 +67,7 @@ module.exports = function(grunt) {
           expand: true,
           cwd: 'src/',
           src: ['**/*.coffee'],
-          dest: 'lib/',
+          dest: 'lib/node_modules/',
           ext: ".js"
         }]
       },
@@ -123,7 +123,7 @@ module.exports = function(grunt) {
     },
     watch: {
       src: {
-        files: ['Gruntfile.js','lib/**/*.js', 'src/**/*.coffee', 'test/**/*coffee'],
+        files: ['Gruntfile.js','lib/**/*.js', 'src/**/*.coffee', 'test/**/*.coffee'],
         tasks: ['build', 'unit'],
         options: {
           spawn: false
@@ -163,7 +163,7 @@ module.exports = function(grunt) {
   grunt.registerTask('merge', ['_feature_branch', '_current_tags', '_latest_tag', '_manage_version']);
 
   grunt.registerTask('clean', function() {
-    grunt.file.delete('lib/txtml');
+    grunt.file.delete('lib/node_modules');
     grunt.file.delete('lib/unit');
     grunt.file.delete('build');
   });
@@ -174,7 +174,7 @@ module.exports = function(grunt) {
   });
 
   grunt.registerTask('_dump_version', function() {
-    grunt.file.write('lib/txtml/version.js', 'exports.version = "' + version + '"\n');
+    grunt.file.write('lib/node_modules/txtml/version.js', 'exports.version = "' + version + '"\n');
   });
 
   grunt.registerTask('_feature_branch', function() {
