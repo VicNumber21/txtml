@@ -1,124 +1,77 @@
 iteration = require('data/iteration').Copy
-clone = require('data/util').clone
+require('data/array')
+HashTable = require('data/hashtable').HashTable
+Hash = require('data/hash').Hash
 
 
 class _Iterator
-  constructor: (@_owner, @_hashes, @_idx, @_step = 1) ->
+  constructor: (@_htIter) ->
 
   prev: () =>
-    new _Iterator @_owner, @_hashes, @_idx - @_step, @_step
+    new _Iterator @_htIter.prev()
 
   next: () =>
-    new _Iterator @_owner, @_hashes, @_idx + @_step, @_step
+    new _Iterator @_htIter.next()
 
   isDone: () =>
-    if @_step > 0
-      @_idx >= @_hashes.length
-    else
-      @_idx < 0
+    @_htIter.isDone()
 
-  _hash: () =>
-    @_hashes[@_idx]
+  hash: () =>
+    @_htIter.hash()
 
   key: () =>
-    @_owner._key @_hash()
+    @view().key
 
   value: () =>
-    @_owner._get @_hash()
+    @view().x
 
   view: () =>
-    key = @key()
-    {key: key, x: @_owner._get key}
+    @_htIter.value()
 
   reverse: () =>
-    new _Iterator @_owner, @_hashes, @_idx , -@_step
-
-  _removed: () =>
-    @_hashes.splice @_idx, 1
-    @
-
-
-throwInvalidKey = () ->
-  throw new Error 'Invalid key'
-
-isSimple = (simple) ->
-  type = typeof simple
-  type is 'number' or type is 'string'
-
-isIter = (obj) ->
-  obj.prev? and obj.next? and obj.key? and obj.value? and obj.view?
-
-isObject = (obj) ->
-  obj? and (typeof obj is 'object')
-
-iterToKey = (iter) ->
-  {key: iter.key(), hash: iter._hash(), iter: iter}
-
-simpleToKey = (simple) ->
-  {key:simple, hash: (typeof simple) + '_' + simple}
-
-objectToKey = (obj) ->
-  if typeof obj.hash is 'function'
-    hash = obj.hash()
-    throwInvalidKey() unless isSimple hash
-    key = clone(obj)
-    key.hash = () -> hash
-    {key: key, hash: 'object_' + simpleToKey(hash).hash}
-  else
-    throwInvalidKey() unless isSimple hash
-
-toKey = (iterOrKey) ->
-  if isSimple(iterOrKey)
-    simpleToKey(iterOrKey)
-  else if isObject(iterOrKey)
-    if isIter(iterOrKey)
-      iterToKey(iterOrKey)
-    else
-      objectToKey(iterOrKey)
-  else
-    throwInvalidKey()
+    new _Iterator @_htIter.reverse()
 
 
 class Map
   constructor: (init = []) ->
-    @_hashTable = {}
+    @_hashTable = new HashTable
     @set key, x for {key, x} in init
 
   get: (key) =>
-    {hash} = toKey key
-    @_get hash
+    hash = new Hash(key)
+    @_hashTable.get(hash.hash())?.x
 
   set: (key, x) =>
-    {key, hash} = toKey key
-    @_hashTable[hash] = {key: key, x: x}
-    @_onModification()
+    hash = new Hash(key)
+    @_hashTable.set hash.hash(), {key: hash.keyClone(), x: x}
     @
 
   remove: (iterOrKey) =>
-    {hash, iter} = toKey iterOrKey
-    x = @_get hash
-    delete @_hashTable[hash]
-    @_onModification()
-    if iter? then [x, iter._removed()] else x
+    hash = new Hash(iterOrKey)
+
+    if hash.isIter()
+      [value, iter] = @_hashTable.delete iterOrKey._htIter
+      [value?.x, new _Iterator iter]
+    else
+      @_hashTable.remove(hash.hash())?.x
 
   contains: (key) =>
-    {hash} = toKey key
-    @_hashTable[hash] isnt undefined
+    hash = new Hash(key)
+    @_hashTable.contains(hash.hash())
 
   keys: () =>
-    iteration.map @._hashes(), ({x}) =>
-      @._key x
+    iteration.map @_hashTable.hashes(), ({x}) =>
+      @_hashTable.get(x).key
 
   values: () =>
-    iteration.map @._hashes(), ({x}) =>
-      @._get x
+    iteration.map @_hashTable.hashes(), ({x}) =>
+      @_hashTable.get(x).x
 
   begin: () =>
-    new _Iterator @, @_hashes(), -1
+    new _Iterator @_hashTable.begin()
 
   end: () =>
-    keys = @_hashes()
-    new _Iterator @, keys, keys.length
+    new _Iterator @_hashTable.end()
 
   first: () =>
     @begin().next()
@@ -127,34 +80,19 @@ class Map
     @end().prev()
 
   length: () =>
-    @_hashes().length
+    @_hashTable.length()
 
   isEmpty: () =>
-    @length() is 0
+    @_hashTable.isEmpty()
 
   toArray: () =>
-    iteration.foldl @, [], (acc, view) ->
-      acc.push view
-      acc
+    Array::fromSequenceView(@)
 
-  cumulate: ({key, value}) =>
-    @set key, value
+  cumulate: ({key, x}) =>
+    @set key, x
 
   replace: (iter, x) =>
-    @set iter.key(), x
-
-  _get: (hash) =>
-    @_hashTable[hash]?.x
-
-  _key: (hash) =>
-    @_hashTable[hash]?.key
-
-  _hashes: () =>
-    @_hashCache = Object.keys(@_hashTable) unless @_hashCache?
-    @_hashCache
-
-  _onModification: () =>
-    delete @_hashCache
+    @set iter, x
 
 
 exports.Map = Map
