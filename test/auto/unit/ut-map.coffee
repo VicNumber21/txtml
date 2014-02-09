@@ -22,9 +22,9 @@ describe 'Map:', ->
       expect(test_map.length()).to.be.equal 0
       expect(test_map.toArray()).to.be.eql []
 
-    it 'should throw "Invalid key" if any key is not valid type', ->
+    it 'should throw "Non-hashable value" if any key is not valid type', ->
       fn = () -> new Map [{key: 'a', x: 'b'}, {key: null, x: 5}]
-      expect(fn).to.throw /Invalid key/
+      expect(fn).to.throw /Non-hashable value/
 
   describe 'Get', ->
     it 'should return contained value', ->
@@ -45,10 +45,10 @@ describe 'Map:', ->
       expect(test_map.get 'key').to.be.equal undefined
       expect(test_map.get new TestKey).to.be.equal undefined
 
-    it 'should throw "Invalid key" if key is not valid type', ->
+    it 'should throw "Non-hashable value" if key is not valid type', ->
       test_map = new Map
       fn = () -> test_map.get {}
-      expect(fn).to.throw /Invalid key/
+      expect(fn).to.throw /Non-hashable value/
 
   describe 'Set', ->
     it 'should set the value for the key', ->
@@ -62,10 +62,10 @@ describe 'Map:', ->
         expect(test_map.length()).to.be.equal idx + 1
         expect(test_map.get key).to.be.equal x
 
-    it 'should throw "Invalid key" if key is not valid type', ->
+    it 'should throw "Non-hashable value" if key is not valid type', ->
       test_map = new Map
       fn = () -> test_map.set undefined, 7
-      expect(fn).to.throw /Invalid key/
+      expect(fn).to.throw /Non-hashable value/
 
     it 'should update the value for the key', ->
       test_map = new Map [{key: 1, x: 4},
@@ -96,10 +96,10 @@ describe 'Map:', ->
       expect(test_map.length()).to.be.equal 1
       expect(test_map.contains 1).to.be.false
 
-    it 'should throw "Invalid key" if key is not valid type', ->
+    it 'should throw "Non-hashable value" if key is not valid type', ->
       test_map = new Map
       fn = () -> test_map.remove {}
-      expect(fn).to.throw /Invalid key/
+      expect(fn).to.throw /Non-hashable value/
 
     it 'should return undefined if the key is not found', ->
       test_map = new Map [{key: 1, x: 4},
@@ -142,10 +142,10 @@ describe 'Map:', ->
       expect(test_map.contains '3').to.be.false
       expect(test_map.contains new TestKey '1').to.be.false
 
-    it 'should throw "Invalid key" if key is not valid type', ->
+    it 'should throw "Non-hashable value" if key is not valid type', ->
       test_map = new Map
       fn = () -> test_map.contains {}
-      expect(fn).to.throw /Invalid key/
+      expect(fn).to.throw /Non-hashable value/
 
   describe 'Keys', ->
     it 'should return empty array if the map is empty', ->
@@ -240,3 +240,5 @@ describe 'Map:', ->
         expect(keys).to.contain currentKey
 
       expect(objectFound).to.be.true
+
+# TODO add iteration tests here

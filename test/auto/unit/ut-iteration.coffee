@@ -1,3 +1,5 @@
+# TODO: move iteration tests to appropriate collections
+
 describe 'Iteration:', ->
   describe 'Copy:', ->
     describe 'foldl', ->

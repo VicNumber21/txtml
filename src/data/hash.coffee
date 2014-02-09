@@ -32,7 +32,7 @@ class Hash
                     simpleHashType = typeof simpleHash
                     (@_type.name + '_' + simpleHashType + '_' + simpleHash) if simpleHashType in ['number', 'string']
 
-    throw new Error 'Invalid key' if @_hash is undefined
+    throw new Error 'Non-hashable value' if @_hash is undefined
 
   hash: () ->
     @_hash
