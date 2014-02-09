@@ -1,4 +1,4 @@
-require('data/array')
+require 'data/array'
 
 
 class _Iterator
@@ -95,4 +95,4 @@ class HashTable
     delete @_hashCache
 
 
-exports.HashTable = HashTable
+module.exports = HashTable

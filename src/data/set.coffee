@@ -1,7 +1,7 @@
 iteration = require('data/iteration').Copy
-require('data/array')
-HashTable = require('data/hashtable').HashTable
-Hash = require('data/hash').Hash
+require 'data/array'
+HashTable = require 'data/hashtable'
+Hash = require 'data/hash'
 
 
 class _Iterator
@@ -81,4 +81,4 @@ class Set
     @add x
 
 
-exports.Set = Set
+module.exports = Set

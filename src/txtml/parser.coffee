@@ -10,7 +10,7 @@ grammar = "
   start =
     line+
 
-  line = 
+  line =
     newline* st:statement newline? { return st; }
 
   statement =

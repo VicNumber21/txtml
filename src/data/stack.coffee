@@ -1,4 +1,4 @@
-List = require('data/list').List
+List = require 'data/list'
 
 
 class Stack
@@ -23,4 +23,4 @@ class Stack
     @_list.isEmpty()
 
 
-exports.Stack = Stack
+module.exports = Stack

@@ -1,4 +1,4 @@
-require('data/array')
+require 'data/array'
 
 
 class _Direction
@@ -238,4 +238,4 @@ class List
     --@_lenght
 
 
-exports.List = List
+module.exports = List

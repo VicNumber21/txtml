@@ -60,4 +60,4 @@ class Hash
     @_type.code is Type::iter
 
 
-exports.Hash = Hash
+module.exports = Hash

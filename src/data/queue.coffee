@@ -1,4 +1,4 @@
-List = require('data/list').List
+List = require 'data/list'
 
 
 class Queue
@@ -23,4 +23,4 @@ class Queue
     @_list.isEmpty()
 
 
-exports.Queue = Queue
+module.exports = Queue
