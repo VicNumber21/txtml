@@ -302,7 +302,7 @@ describe 'List:', ->
       expect(test_list.length()).to.be.equal 14
       expect(test_list.toArray()).to.be.eql [9, 20, 6, 10, 15, 11, 12, 8, 7, 5, 4, 3, 2, 1]
 
-  describe 'Iteration', ->
+  describe 'Iterator', ->
     it 'should work in forward direction for empty list', ->
       test_list = new List
       iter = test_list.begin()
@@ -340,3 +340,208 @@ describe 'List:', ->
       iter = test_list.reverse().begin().reverse()
       acc = (iter.value() until (iter = iter.next()).isDone())
       expect(acc).to.be.eql [1, 2, 3, 4, 5]
+
+  describe 'Iteration:', ->
+    describe 'Copy:', ->
+      describe 'foldl', ->
+        foldl = Iteration.Copy.foldl
+
+        it 'should return a0 iterating through empty list', ->
+          test_list = new List
+          a = foldl test_list, 4, (a, {x}) ->
+            x - a
+
+          expect(a).to.be.equal 4
+
+        it 'should return correct value iterating through non-empty list', ->
+          test_list = new List [10, -3]
+          a = foldl test_list, 4, (a, {x}) ->
+            x - a
+
+          expect(a).to.be.equal -9
+
+      describe 'foldr', ->
+        foldr = Iteration.Copy.foldr
+
+        it 'should return a0 iterating through empty list', ->
+          test_list = new List
+          a = foldr test_list, 4, ({x}, a) ->
+            x - a
+
+          expect(a).to.be.equal 4
+
+        it 'should return correct value iterating through non-empty list', ->
+          test_list = new List [10, -3]
+          a = foldr test_list, 4, ({x}, a) ->
+            x - a
+
+          expect(a).to.be.equal 17
+
+      describe 'map', ->
+        map = Iteration.Copy.map
+
+        it 'should return empty list iterating through empty list', ->
+          test_list = new List
+          r = map test_list, ({x}) ->
+            -x
+
+          expect(r.toArray()).to.be.eql []
+          expect(r).to.be.not.equal test_list
+
+        it 'should return correct value iterating through non-empty list', ->
+          test_list = new List [10, -3]
+          r = map test_list, ({x}) ->
+            -x
+
+          expect(r.toArray()).to.be.eql [-10, 3]
+          expect(r).to.be.not.equal test_list
+
+      describe 'rmap', ->
+        rmap = Iteration.Copy.rmap
+
+        it 'should return empty list iterating through empty list', ->
+          test_list = new List
+          r = rmap test_list, ({x}) ->
+            -x
+
+          expect(r.toArray()).to.be.eql []
+          expect(r).to.be.not.equal test_list
+
+        it 'should return correct value iterating through non-empty list', ->
+          test_list = new List [10, -3]
+          r = rmap test_list, ({x}) ->
+            -x
+
+          expect(r.toArray()).to.be.eql [3, -10]
+          expect(r).to.be.not.equal test_list
+
+      describe 'forEach', ->
+        forEach = Iteration.Copy.forEach
+
+        it 'should not perform callback iterating through empty list', ->
+          test_list = new List
+          r = []
+          forEach test_list, ({x}) ->
+            r.push(x)
+
+          expect(r).to.be.eql []
+
+        it 'should perform callback iterating through non-empty list', ->
+          test_list = new List [10, -3]
+          r = []
+          forEach test_list, ({x}) ->
+            r.push(x)
+
+          expect(r).to.be.eql [10, -3]
+
+      describe 'filter', ->
+        filter = Iteration.Copy.filter
+
+        it 'should return empty list iterating through empty list', ->
+          test_list = new List
+          r = filter test_list, ({x}) ->
+            x > 0
+
+          expect(r.toArray()).to.be.eql []
+          expect(r).to.be.not.equal test_list
+
+        it 'should return correct value iterating through non-empty list', ->
+          test_list = new List [10, -3]
+          r = filter test_list, ({x}) ->
+            x > 0
+
+          expect(r.toArray()).to.be.eql [10]
+          expect(r).to.be.not.equal test_list
+
+      describe 'any', ->
+        any = Iteration.Copy.any
+
+        it 'should return false through empty list', ->
+          test_list = new List
+          p = ({x}) ->
+            x > 0
+
+          expect(any test_list, p).to.be.false
+
+        it 'should return correct value iterating through non-empty list', ->
+          test_list = new List [10, -3]
+          p = ({x}) ->
+            x > 0
+
+          expect(any test_list, p).to.be.true
+
+        it 'should stop iterationg once result found', ->
+          test_list = new List [10, -3, 5, -7]
+          count = 0
+          p = ({x}) ->
+            ++count
+            x < 0
+
+          expect(any test_list, p).to.be.true
+          expect(count).to.be.equal 2
+
+      describe 'all', ->
+        all = Iteration.Copy.all
+
+        it 'should return false through empty list', ->
+          test_list = new List
+          p = ({x}) ->
+            x > 0
+
+          expect(all test_list, p).to.be.false
+
+        it 'should return correct value iterating through non-empty list', ->
+          test_list = new List [10, -3]
+          p = ({x}) ->
+            x > 0
+
+          expect(all test_list, p).to.be.false
+
+        it 'should stop iterationg once result found', ->
+          test_list = new List [10, -3, 5, -7]
+          count = 0
+          p = ({x}) ->
+            ++count
+            x > 0
+
+          expect(all test_list, p).to.be.false
+          expect(count).to.be.equal 2
+
+    describe 'Replace:', ->
+      describe 'map', ->
+        map = Iteration.Replace.map
+
+        it 'should return empty list iterating through empty list', ->
+          test_list = new List
+          r = map test_list, ({x}) ->
+            -x
+
+          expect(r.toArray()).to.be.eql []
+          expect(r).to.be.equal test_list
+
+        it 'should return correct value iterating through non-empty list', ->
+          test_list = new List [10, -3]
+          r = map test_list, ({x}) ->
+            -x
+
+          expect(r.toArray()).to.be.eql [-10, 3]
+          expect(r).to.be.equal test_list
+
+      describe 'filter', ->
+        filter = Iteration.Replace.filter
+
+        it 'should return empty list iterating through empty list', ->
+          test_list = new List
+          r = filter test_list, ({x}) ->
+            x > 0
+
+          expect(r.toArray()).to.be.eql []
+          expect(r).to.be.equal test_list
+
+        it 'should return correct value iterating through non-empty list', ->
+          test_list = new List [10, -3]
+          r = filter test_list, ({x}) ->
+            x > 0
+
+          expect(r.toArray()).to.be.eql [10]
+          expect(r).to.be.equal test_list
