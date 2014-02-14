@@ -80,5 +80,9 @@ class Set
   cumulate: ({x}) =>
     @add x
 
+  replace: (iter, x) =>
+    @add  x
+    @_hashTable.remove iter.hash()
+
 
 module.exports = Set

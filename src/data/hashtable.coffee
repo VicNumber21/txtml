@@ -89,7 +89,9 @@ class HashTable
     @set hash, x
 
   replace: (iter, x) =>
+    oldValue = iter.value()
     @set iter.hash(), x
+    oldValue
 
   _onModification: () =>
     delete @_hashCache

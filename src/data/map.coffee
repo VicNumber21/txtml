@@ -92,7 +92,9 @@ class Map
     @set key, x
 
   replace: (iter, x) =>
+    oldValue = iter.value()
     @set iter, x
+    oldValue
 
 
 module.exports = Map
