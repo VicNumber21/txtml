@@ -109,4 +109,207 @@ describe 'Set:', ->
       values.sort()
       expect(values).to.be.eql test_data
 
-# TODO add iteration tests
+  describe 'Iteration:', ->
+    describe 'Copy:', ->
+      describe 'foldl', ->
+        foldl = Iteration.Copy.foldl
+
+        it 'should return a0 iterating through empty set', ->
+          test_set = new Set
+          a = foldl test_set, 4, (a, {x}) ->
+            x - a
+
+          expect(a).to.be.equal 4
+
+        it 'should return correct value iterating through non-empty set', ->
+          test_set = new Set [10, -3]
+          a = foldl test_set, 4, (a, {x}) ->
+            x - a
+
+          expect(a).to.be.equal -9
+
+      describe 'foldr', ->
+        foldr = Iteration.Copy.foldr
+
+        it 'should return a0 iterating through empty set', ->
+          test_set = new Set
+          a = foldr test_set, 4, ({x}, a) ->
+            x - a
+
+          expect(a).to.be.equal 4
+
+        it 'should return correct value iterating through non-empty set', ->
+          test_set = new Set [10, -3]
+          a = foldr test_set, 4, ({x}, a) ->
+            x - a
+
+          expect(a).to.be.equal 17
+
+      describe 'map', ->
+        map = Iteration.Copy.map
+
+        it 'should return empty set iterating through empty set', ->
+          test_set = new Set
+          r = map test_set, ({x}) ->
+            -x
+
+          expect(r.toArray()).to.be.eql []
+          expect(r).to.be.not.equal test_set
+
+        it 'should return correct value iterating through non-empty set', ->
+          test_set = new Set [10, -3]
+          r = map test_set, ({x}) ->
+            -x
+
+          expect(r.toArray()).to.be.eql [-10, 3]
+          expect(r).to.be.not.equal test_set
+
+      describe 'rmap', ->
+        rmap = Iteration.Copy.rmap
+
+        it 'should return empty set iterating through empty set', ->
+          test_set = new Set
+          r = rmap test_set, ({x}) ->
+            -x
+
+          expect(r.toArray()).to.be.eql []
+          expect(r).to.be.not.equal test_set
+
+        it 'should return correct value iterating through non-empty set', ->
+          test_set = new Set [10, -3]
+          r = rmap test_set, ({x}) ->
+            -x
+
+          expect(r.toArray()).to.be.eql [3, -10]
+          expect(r).to.be.not.equal test_set
+
+      describe 'forEach', ->
+        forEach = Iteration.Copy.forEach
+
+        it 'should not perform callback iterating through empty set', ->
+          test_set = new Set
+          r = []
+          forEach test_set, ({x}) ->
+            r.push(x)
+
+          expect(r).to.be.eql []
+
+        it 'should perform callback iterating through non-empty set', ->
+          test_set = new Set [10, -3]
+          r = []
+          forEach test_set, ({x}) ->
+            r.push(x)
+
+          expect(r).to.be.eql [10, -3]
+
+      describe 'filter', ->
+        filter = Iteration.Copy.filter
+
+        it 'should return empty set iterating through empty set', ->
+          test_set = new Set
+          r = filter test_set, ({x}) ->
+            x > 0
+
+          expect(r.toArray()).to.be.eql []
+          expect(r).to.be.not.equal test_set
+
+        it 'should return correct value iterating through non-empty set', ->
+          test_set = new Set [10, -3]
+          r = filter test_set, ({x}) ->
+            x > 0
+
+          expect(r.toArray()).to.be.eql [10]
+          expect(r).to.be.not.equal test_set
+
+      describe 'any', ->
+        any = Iteration.Copy.any
+
+        it 'should return false through empty set', ->
+          test_set = new Set
+          p = ({x}) ->
+            x > 0
+
+          expect(any test_set, p).to.be.false
+
+        it 'should return correct value iterating through non-empty set', ->
+          test_set = new Set [10, -3]
+          p = ({x}) ->
+            x > 0
+
+          expect(any test_set, p).to.be.true
+
+        it 'should stop iterationg once result found', ->
+          test_set = new Set [10, -3, 5, -7]
+          count = 0
+          p = ({x}) ->
+            ++count
+            x < 0
+
+          expect(any test_set, p).to.be.true
+          expect(count).to.be.equal 2
+
+      describe 'all', ->
+        all = Iteration.Copy.all
+
+        it 'should return false through empty set', ->
+          test_set = new Set
+          p = ({x}) ->
+            x > 0
+
+          expect(all test_set, p).to.be.false
+
+        it 'should return correct value iterating through non-empty set', ->
+          test_set = new Set [10, -3]
+          p = ({x}) ->
+            x > 0
+
+          expect(all test_set, p).to.be.false
+
+        it 'should stop iterationg once result found', ->
+          test_set = new Set [10, -3, 5, -7]
+          count = 0
+          p = ({x}) ->
+            ++count
+            x > 0
+
+          expect(all test_set, p).to.be.false
+          expect(count).to.be.equal 2
+
+    describe 'Replace:', ->
+      describe 'map', ->
+        map = Iteration.Replace.map
+
+        it 'should return empty set iterating through empty set', ->
+          test_set = new Set
+          r = map test_set, ({x}) ->
+            -x
+
+          expect(r.toArray()).to.be.eql []
+          expect(r).to.be.equal test_set
+
+        it 'should return correct value iterating through non-empty set', ->
+          test_set = new Set [10, -3]
+          r = map test_set, ({x}) ->
+            -x
+
+          expect(r.toArray()).to.be.eql [-10, 3]
+          expect(r).to.be.equal test_set
+
+      describe 'filter', ->
+        filter = Iteration.Replace.filter
+
+        it 'should return empty set iterating through empty set', ->
+          test_set = new Set
+          r = filter test_set, ({x}) ->
+            x > 0
+
+          expect(r.toArray()).to.be.eql []
+          expect(r).to.be.equal test_set
+
+        it 'should return correct value iterating through non-empty set', ->
+          test_set = new Set [10, -3]
+          r = filter test_set, ({x}) ->
+            x > 0
+
+          expect(r.toArray()).to.be.eql [10]
+          expect(r).to.be.equal test_set
