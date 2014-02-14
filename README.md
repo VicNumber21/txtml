@@ -29,9 +29,10 @@ and etc.
 The current roadmap is the following:
 - 0.0.x - Proof of Concept
 - 0.1.x - Infrastructure
-- 0.2.x - Graph utils
-- 0.3.x - Class Diagram - Basic
-- 0.4.x - State Diagram - Basic
+- 0.2.x - Data Structures
+- 0.3.x - Graph Utils
+- 0.4.x - Class Diagram - Basic
+- 0.5.x - State Diagram - Basic
 - 0.6.x - Collaboration Diagram - Basic
 - 0.8.x - Sequence Diagram - Basic
 - 0.10.x - Views and Simple Layouts
