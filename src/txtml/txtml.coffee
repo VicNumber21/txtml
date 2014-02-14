@@ -13,4 +13,4 @@ txtml.render = (view) ->
   renderer.render txtml.graph, view
   txtml
 
-exports.txtml = txtml
+module.exports = txtml

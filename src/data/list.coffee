@@ -1,3 +1,6 @@
+require 'data/array'
+
+
 class _Direction
   _k_backward: 0
   _k_forward: 1
@@ -177,8 +180,7 @@ class List
     [node.value, next]
 
   toArray: () =>
-    iter = @begin()
-    iter.value() until (iter = iter.next()).isDone()
+    Array::fromSequenceValue(@)
 
   _dummyIter: (direction) =>
     new _Iterator @, @_dummy, direction
@@ -236,4 +238,4 @@ class List
     --@_lenght
 
 
-exports.List = List
+module.exports = List

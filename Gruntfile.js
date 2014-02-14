@@ -174,7 +174,7 @@ module.exports = function(grunt) {
   });
 
   grunt.registerTask('_dump_version', function() {
-    grunt.file.write('lib/node_modules/txtml/version.js', 'exports.version = "' + version + '"\n');
+    grunt.file.write('lib/node_modules/txtml/version.js', 'module.exports = "' + version + '"\n');
   });
 
   grunt.registerTask('_feature_branch', function() {

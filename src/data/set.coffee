@@ -19,53 +19,42 @@ class _Iterator
   hash: () =>
     @_htIter.hash()
 
-  key: () =>
-    @view().key
-
   value: () =>
-    @view().x
+    @_htIter.value()
 
   view: () =>
-    @_htIter.value()
+    {x: @value()}
 
   reverse: () =>
     new _Iterator @_htIter.reverse()
 
 
-class Map
+class Set
   constructor: (init = []) ->
     @_hashTable = new HashTable
-    @set key, x for {key, x} in init
+    @add x for x in init
 
-  get: (key) =>
-    hash = new Hash(key)
-    @_hashTable.get(hash.hash())?.x
-
-  set: (key, x) =>
-    hash = new Hash(key)
-    @_hashTable.set hash.hash(), {key: hash.keyClone(), x: x}
+  add: (x) =>
+    hash = new Hash(x)
+    @_hashTable.set hash.hash(), x
     @
 
-  remove: (iterOrKey) =>
-    hash = new Hash(iterOrKey)
+  remove: (iterOrX) =>
+    hash = new Hash(iterOrX)
 
     if hash.isIter()
-      [value, iter] = @_hashTable.delete iterOrKey._htIter
-      [value?.x, new _Iterator iter]
+      [value, iter] = @_hashTable.delete iterOrX._htIter
+      [value, new _Iterator iter]
     else
-      @_hashTable.remove(hash.hash())?.x
+      @_hashTable.remove hash.hash()
 
-  contains: (key) =>
-    hash = new Hash(key)
+  contains: (x) =>
+    hash = new Hash(x)
     @_hashTable.contains(hash.hash())
-
-  keys: () =>
-    iteration.map @_hashTable.hashes(), ({x}) =>
-      @_hashTable.get(x).key
 
   values: () =>
     iteration.map @_hashTable.hashes(), ({x}) =>
-      @_hashTable.get(x).x
+      @_hashTable.get(x)
 
   begin: () =>
     new _Iterator @_hashTable.begin()
@@ -86,15 +75,14 @@ class Map
     @_hashTable.isEmpty()
 
   toArray: () =>
-    Array::fromSequenceView(@)
+    Array::fromSequenceValue(@)
 
-  cumulate: ({key, x}) =>
-    @set key, x
+  cumulate: ({x}) =>
+    @add x
 
   replace: (iter, x) =>
-    oldValue = iter.value()
-    @set iter, x
-    oldValue
+    @add  x
+    @_hashTable.remove iter.hash()
 
 
-module.exports = Map
+module.exports = Set

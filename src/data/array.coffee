@@ -1,3 +1,6 @@
+iteration = require('data/iteration').Copy
+
+
 class _Iterator
   constructor: (@_owner, @_idx, @_step = 1) ->
 
@@ -51,3 +54,13 @@ Array::remove = (iter) ->
 
 Array::isEmpty = () ->
   @length is 0
+
+Array::fromSequenceView = (seq) =>
+  iteration.foldl seq, [], (acc, view) ->
+    acc.push view
+    acc
+
+Array::fromSequenceValue = (seq) =>
+  iteration.foldl seq, [], (acc, {x}) ->
+    acc.push x
+    acc

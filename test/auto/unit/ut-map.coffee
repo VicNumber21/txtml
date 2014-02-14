@@ -22,9 +22,9 @@ describe 'Map:', ->
       expect(test_map.length()).to.be.equal 0
       expect(test_map.toArray()).to.be.eql []
 
-    it 'should throw "Invalid key" if any key is not valid type', ->
+    it 'should throw "Non-hashable value" if any key is not valid type', ->
       fn = () -> new Map [{key: 'a', x: 'b'}, {key: null, x: 5}]
-      expect(fn).to.throw /Invalid key/
+      expect(fn).to.throw /Non-hashable value/
 
   describe 'Get', ->
     it 'should return contained value', ->
@@ -45,10 +45,10 @@ describe 'Map:', ->
       expect(test_map.get 'key').to.be.equal undefined
       expect(test_map.get new TestKey).to.be.equal undefined
 
-    it 'should throw "Invalid key" if key is not valid type', ->
+    it 'should throw "Non-hashable value" if key is not valid type', ->
       test_map = new Map
       fn = () -> test_map.get {}
-      expect(fn).to.throw /Invalid key/
+      expect(fn).to.throw /Non-hashable value/
 
   describe 'Set', ->
     it 'should set the value for the key', ->
@@ -62,10 +62,10 @@ describe 'Map:', ->
         expect(test_map.length()).to.be.equal idx + 1
         expect(test_map.get key).to.be.equal x
 
-    it 'should throw "Invalid key" if key is not valid type', ->
+    it 'should throw "Non-hashable value" if key is not valid type', ->
       test_map = new Map
       fn = () -> test_map.set undefined, 7
-      expect(fn).to.throw /Invalid key/
+      expect(fn).to.throw /Non-hashable value/
 
     it 'should update the value for the key', ->
       test_map = new Map [{key: 1, x: 4},
@@ -96,10 +96,10 @@ describe 'Map:', ->
       expect(test_map.length()).to.be.equal 1
       expect(test_map.contains 1).to.be.false
 
-    it 'should throw "Invalid key" if key is not valid type', ->
+    it 'should throw "Non-hashable value" if key is not valid type', ->
       test_map = new Map
       fn = () -> test_map.remove {}
-      expect(fn).to.throw /Invalid key/
+      expect(fn).to.throw /Non-hashable value/
 
     it 'should return undefined if the key is not found', ->
       test_map = new Map [{key: 1, x: 4},
@@ -142,10 +142,10 @@ describe 'Map:', ->
       expect(test_map.contains '3').to.be.false
       expect(test_map.contains new TestKey '1').to.be.false
 
-    it 'should throw "Invalid key" if key is not valid type', ->
+    it 'should throw "Non-hashable value" if key is not valid type', ->
       test_map = new Map
       fn = () -> test_map.contains {}
-      expect(fn).to.throw /Invalid key/
+      expect(fn).to.throw /Non-hashable value/
 
   describe 'Keys', ->
     it 'should return empty array if the map is empty', ->
@@ -240,3 +240,209 @@ describe 'Map:', ->
         expect(keys).to.contain currentKey
 
       expect(objectFound).to.be.true
+
+  describe 'Iteration:', ->
+    describe 'Copy:', ->
+      describe 'foldl', ->
+        foldl = Iteration.Copy.foldl
+
+        it 'should return a0 iterating through empty map', ->
+          test_map = new Map
+          a = foldl test_map, 4, (a, {x}) ->
+            x - a
+
+          expect(a).to.be.equal 4
+
+        it 'should return correct value iterating through non-empty map', ->
+          test_map = new Map [{key:'1', x: 10}, {key: '2', x: -3}]
+          a = foldl test_map, 4, (a, {x}) ->
+            x - a
+
+          expect(a).to.be.equal -9
+
+      describe 'foldr', ->
+        foldr = Iteration.Copy.foldr
+
+        it 'should return a0 iterating through empty map', ->
+          test_map = new Map
+          a = foldr test_map, 4, ({x}, a) ->
+            x - a
+
+          expect(a).to.be.equal 4
+
+        it 'should return correct value iterating through non-empty map', ->
+          test_map = new Map [{key:'1', x: 10}, {key: '2', x: -3}]
+          a = foldr test_map, 4, ({x}, a) ->
+            x - a
+
+          expect(a).to.be.equal 17
+
+      describe 'map', ->
+        map = Iteration.Copy.map
+
+        it 'should return empty map iterating through empty map', ->
+          test_map = new Map
+          r = map test_map, ({x}) ->
+            -x
+
+          expect(r.toArray()).to.be.eql []
+          expect(r).to.be.not.equal test_map
+
+        it 'should return correct value iterating through non-empty map', ->
+          test_map = new Map [{key:'1', x: 10}, {key: '2', x: -3}]
+          r = map test_map, ({x}) ->
+            -x
+
+          expect(r.toArray()).to.be.eql [{key:'1', x: -10}, {key: '2', x: 3}]
+          expect(r).to.be.not.equal test_map
+
+      describe 'rmap', ->
+        rmap = Iteration.Copy.rmap
+
+        it 'should return empty map iterating through empty map', ->
+          test_map = new Map
+          r = rmap test_map, ({x}) ->
+            -x
+
+          expect(r.toArray()).to.be.eql []
+          expect(r).to.be.not.equal test_map
+
+        it 'should return correct value iterating through non-empty map', ->
+          test_map = new Map [{key:'1', x: 10}, {key: '2', x: -3}]
+          r = rmap test_map, ({x}) ->
+            -x
+
+          expect(r.toArray()).to.be.eql [{key:'2', x: 3}, {key: '1', x: -10}]
+          expect(r).to.be.not.equal test_map
+
+      describe 'forEach', ->
+        forEach = Iteration.Copy.forEach
+
+        it 'should not perform callback iterating through empty map', ->
+          test_map = new Map
+          r = []
+          forEach test_map, ({x}) ->
+            r.push(x)
+
+          expect(r).to.be.eql []
+
+        it 'should perform callback iterating through non-empty map', ->
+          test_map = new Map [{key:'1', x: 10}, {key: '2', x: -3}]
+          r = []
+          forEach test_map, ({key, x}) ->
+            r.push(key)
+            r.push(x)
+
+          expect(r).to.be.eql ['1', 10, '2', -3]
+
+      describe 'filter', ->
+        filter = Iteration.Copy.filter
+
+        it 'should return empty map iterating through empty map', ->
+          test_map = new Map
+          r = filter test_map, ({x}) ->
+            x > 0
+
+          expect(r.toArray()).to.be.eql []
+          expect(r).to.be.not.equal test_map
+
+        it 'should return correct value iterating through non-empty map', ->
+          test_map = new Map [{key:'1', x: 10}, {key: '2', x: -3}]
+          r = filter test_map, ({x}) ->
+            x > 0
+
+          expect(r.toArray()).to.be.eql [{key: '1', x: 10}]
+          expect(r).to.be.not.equal test_map
+
+      describe 'any', ->
+        any = Iteration.Copy.any
+
+        it 'should return false through empty map', ->
+          test_map = new Map
+          p = ({x}) ->
+            x > 0
+
+          expect(any test_map, p).to.be.false
+
+        it 'should return correct value iterating through non-empty map', ->
+          test_map = new Map [{key:'1', x: 10}, {key: '2', x: -3}]
+          p = ({x}) ->
+            x > 0
+
+          expect(any test_map, p).to.be.true
+
+        it 'should stop iterationg once result found', ->
+          test_map = new Map [{key:'1', x: 10}, {key: '2', x: -3}, {key: '3', x: 5}, {key: '4', x: -7}]
+          count = 0
+          p = ({x}) ->
+            ++count
+            x < 0
+
+          expect(any test_map, p).to.be.true
+          expect(count).to.be.equal 2
+
+      describe 'all', ->
+        all = Iteration.Copy.all
+
+        it 'should return false through empty map', ->
+          test_map = new Map
+          p = ({x}) ->
+            x > 0
+
+          expect(all test_map, p).to.be.false
+
+        it 'should return correct value iterating through non-empty map', ->
+          test_map = new Map [{key:'1', x: 10}, {key: '2', x: -3}]
+          p = ({x}) ->
+            x > 0
+
+          expect(all test_map, p).to.be.false
+
+        it 'should stop iterationg once result found', ->
+          test_map = new Map [{key:'1', x: 10}, {key: '2', x: -3}, {key: '3', x: 5}, {key: '4', x: -7}]
+          count = 0
+          p = ({x}) ->
+            ++count
+            x > 0
+
+          expect(all test_map, p).to.be.false
+          expect(count).to.be.equal 2
+
+    describe 'Replace:', ->
+      describe 'map', ->
+        map = Iteration.Replace.map
+
+        it 'should return empty map iterating through empty map', ->
+          test_map = new Map
+          r = map test_map, ({x}) ->
+            -x
+
+          expect(r.toArray()).to.be.eql []
+          expect(r).to.be.equal test_map
+
+        it 'should return correct value iterating through non-empty map', ->
+          test_map = new Map [{key:'1', x: 10}, {key: '2', x: -3}]
+          r = map test_map, ({x}) ->
+            -x
+
+          expect(r.toArray()).to.be.eql [{key: '1', x: -10}, {key: '2', x: 3}]
+          expect(r).to.be.equal test_map
+
+      describe 'filter', ->
+        filter = Iteration.Replace.filter
+
+        it 'should return empty map iterating through empty map', ->
+          test_map = new Map
+          r = filter test_map, ({x}) ->
+            x > 0
+
+          expect(r.toArray()).to.be.eql []
+          expect(r).to.be.equal test_map
+
+        it 'should return correct value iterating through non-empty map', ->
+          test_map = new Map [{key:'1', x: 10}, {key: '2', x: -3}]
+          r = filter test_map, ({x}) ->
+            x > 0
+
+          expect(r.toArray()).to.be.eql [{key: '1', x: 10}]
+          expect(r).to.be.equal test_map
