@@ -28,11 +28,11 @@ rect {
   fill: none;
 }
 
-.edge rect {
+.edgeLabel rect {
   fill: #fff;
 }
 
-.edge path {
+.edgePath path {
   fill: none;
   stroke: #333;
   stroke-width: 1.5px;
