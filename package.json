@@ -1,6 +1,6 @@
 {
   "name": "txtml",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "author": "Victor Portnov <vic.portnov@gmail.com",
   "repository": {
     "type": "git",
@@ -22,12 +22,10 @@
     "grunt-mocha": "0.4.10",
     "grunt-contrib-copy": "0.5.0",
     "grunt-contrib-concat": "0.3.0",
-    "d3": "3.3.13",
     "pegjs": "0.7.0",
-    "chai": "1.9.0"
-  },
-  "dependencies": {
     "graphlib": "0.7.4",
-    "dagre-d3": "0.1.4"
+    "dagre-d3": "0.1.4",
+    "d3": "3.3.13",
+    "chai": "1.9.0"
   }
 }
