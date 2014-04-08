@@ -85,7 +85,7 @@ class HashTable
   toArray: () =>
     Array::fromSequenceView(@)
 
-  cumulate: ({hash, x}) =>
+  cumulate: (x, {hash}) =>
     @set hash, x
 
   replace: (iter, x) =>
