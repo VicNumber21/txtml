@@ -1,70 +1,115 @@
 _new = require('data/util').new
+clone = require('data/util').clone
 
-_iterate = (iter, acc0, f) ->
+_iterate = (iter, acc0, viewModifier, f) ->
   ctrl = stop: false, acc: acc0, iter: iter
-  ctrl.acc = f ctrl.iter.view(), ctrl until ctrl.stop or (ctrl.iter = ctrl.iter.next()).isDone()
+  ctrl.acc = f viewModifier(ctrl.iter.view()), ctrl until ctrl.stop or (ctrl.iter = ctrl.iter.next()).isDone()
   ctrl.acc
 
 
-class CopyIteration
-  @foldl = (s, a0, f) ->
-    _iterate s.begin(), a0, (view, {acc}) ->
-      f acc, view
+class Base
+  constructor: (safeView) ->
+    @_viewModifier = if safeView then clone else (x) -> x
 
-  @foldr: (s, a0, f) ->
-    _iterate s.end().reverse(), a0, (view, {acc}) ->
-      f view, acc
+  from: (@_s, reversed) =>
+    @_begin = if reversed then @_s.end().reverse() else @_s.begin()
+    @
 
-  @map: (s, f) ->
-    CopyIteration.foldl s, _new(s), (a, view) ->
-      view.x = f view
-      a.cumulate view
 
-  @rmap: (s, f) ->
-    CopyIteration.foldr s, _new(s), (view, a) ->
-      view.x = f view
-      a.cumulate view
+class ForEachBase extends Base
+  constructor: (safeView) ->
+    super safeView
+    @_p = () -> true
 
-  @forEach: (s, f) ->
-    CopyIteration.foldl s, undefined, (a, view) ->
+  if: (@_p) =>
+    @
+
+  reduce: (a0, f) =>
+    throw new Error 'Sequence is not defined' unless @_begin?
+
+    _iterate @_begin, a0, @_viewModifier, (view, {acc}) =>
+      if @_p view
+        f acc, view
+      else
+        acc
+
+  do: (f) =>
+    @reduce undefined, (a, view) =>
       f view
 
-    undefined
+  filter: (p) =>
+    @if(p).map ({x}) -> x
 
-  @filter: (s, p) ->
-    CopyIteration.foldl s, _new(s), (a, view) ->
-      if p view then a.cumulate view else a
 
-  @any: (s, p) ->
-    _iterate s.begin(), false, (view, ctrl) ->
+class ForEachCopy extends ForEachBase
+  to: (@_acc) =>
+    @
+
+  _getAcc: () =>
+    @_acc ?= _new @_s
+
+  map: (f = ({x}) -> x) =>
+    @reduce @_getAcc(), (a, view) =>
+      a.cumulate f(view), view
+
+
+class ForEachReplace extends ForEachBase
+  map: (f) =>
+    iter = @_s.first()
+
+    until iter.isDone()
+      view = iter.view()
+
+      if @_p view
+        @_s.replace iter, f view
+        iter = iter.next()
+      else
+        [_, iter] = @_s.remove iter
+
+    @_s
+
+
+class Any extends Base
+  is: (p) =>
+    _iterate @_begin, false, @_viewModifier, (view, ctrl) =>
       ctrl.stop = p view
 
-  @all: (s, p) ->
-    if s.isEmpty()
+
+class Each extends Any
+  is: (p) =>
+    if @_s.isEmpty()
       false
     else
-      not CopyIteration.any s, (view) ->
+      not super (view) =>
         not p view
 
 
-class ReplaceIteration extends CopyIteration
-  @map: (s, f) ->
-    _iterate s.begin(), undefined, (view, {iter}) ->
-      s.replace iter, f view
+class Interface
+  constructor: (@_iterationClass, @_safeView) ->
 
-    s
+  from: (s) =>
+    iteration = new @_iterationClass @_safeView
+    iteration.from(s, false)
 
-  @filter: (s, p) ->
-    iter = s.first()
-
-    until iter.isDone()
-      if p iter.view()
-        iter = iter.next()
-      else
-        [_, iter] = s.remove iter
-
-    s
+  fromReversed: (s) =>
+    iteration = new @_iterationClass
+    iteration.from(s, true)
 
 
-exports.Copy = CopyIteration
-exports.Replace = ReplaceIteration
+class Iteration
+  constructor: (ForEachClass) ->
+    @forEach = new Interface ForEachClass
+    @ifEach = new Interface Each
+    @ifAny = new Interface Any
+
+
+exports.Copy =
+  forEach: new Interface ForEachCopy, true
+  ifEach: new Interface Each, true
+  ifAny: new Interface Any, true
+
+
+exports.Replace =
+  forEach: new Interface ForEachReplace, false
+  ifEach: new Interface Each, false
+  ifAny: new Interface Any, false

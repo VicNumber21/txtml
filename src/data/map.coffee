@@ -1,4 +1,3 @@
-iteration = require('data/iteration').Copy
 require 'data/array'
 HashTable = require 'data/hashtable'
 Hash = require 'data/hash'
@@ -60,12 +59,10 @@ class Map
     @_hashTable.contains(hash.hash())
 
   keys: () =>
-    iteration.map @_hashTable.hashes(), ({x}) =>
-      @_hashTable.get(x).key
+    @_hashTable.get(hash).key for hash in @_hashTable.hashes()
 
   values: () =>
-    iteration.map @_hashTable.hashes(), ({x}) =>
-      @_hashTable.get(x).x
+    @_hashTable.get(hash).x for hash in @_hashTable.hashes()
 
   begin: () =>
     new _Iterator @_hashTable.begin()
@@ -88,7 +85,7 @@ class Map
   toArray: () =>
     Array::fromSequenceView(@)
 
-  cumulate: ({key, x}) =>
+  cumulate: (x, {key}) =>
     @set key, x
 
   replace: (iter, x) =>

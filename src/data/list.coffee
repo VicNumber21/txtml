@@ -143,7 +143,7 @@ class List
     @_insertBefore @end(), val
     @
 
-  cumulate: ({x}) =>
+  cumulate: (x) =>
     @append x
 
   insertBefore: (iter, val) =>

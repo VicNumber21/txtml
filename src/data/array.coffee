@@ -1,4 +1,4 @@
-iteration = require('data/iteration').Copy
+forEach = require('data/iteration').Copy.forEach
 
 
 class _Iterator
@@ -38,7 +38,7 @@ Array::first = () ->
 Array::last = () ->
   @end().prev()
 
-Array::cumulate = ({x}) ->
+Array::cumulate = (x) ->
   @push x
   @
 
@@ -56,11 +56,8 @@ Array::isEmpty = () ->
   @length is 0
 
 Array::fromSequenceView = (seq) =>
-  iteration.foldl seq, [], (acc, view) ->
-    acc.push view
-    acc
+  forEach.from(seq).to([]).map (view) ->
+    view
 
 Array::fromSequenceValue = (seq) =>
-  iteration.foldl seq, [], (acc, {x}) ->
-    acc.push x
-    acc
+  forEach.from(seq).to([]).map()
